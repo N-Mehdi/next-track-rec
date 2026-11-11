@@ -244,7 +244,9 @@ python -m nexttrack.train.train_sasrec --set sasrec.run_name=a_d128
   target user for both days (`candidates_val.parquet`, `candidates_test.parquet`).
 
 Two configurations only, identical except for the embedding size: A (128) and B (256).
-`notebooks/kaggle/02_sasrec` clones this repository and runs both on the dataset above.
+A first run trained both for 20 epochs. `notebooks/kaggle/02_sasrec` now clones this
+repository and retrains A alone for up to 60 epochs (run `a_d128_e60`), since A was still
+improving at epoch 20.
 Results (one T4, fp16, reports in `reports/sasrec_a_d128.json` and `reports/sasrec_b_d256.json`):
 
 | Config | Epochs run, best | Training time | val ndcg@10 | test recall@10 | test ndcg@10 | test recall@100 |

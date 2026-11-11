@@ -1,0 +1,17 @@
+{
+  "item_pool": 886143,
+  "item_map_rows": 627648,
+  "train_events_rows": 29135186,
+  "val_events_rows": 143557,
+  "test_events_rows": 157695,
+  "catalogue_rows": 824997,
+  "history_val_users": 9207,
+  "history_test_users": 9207,
+  "val_targets_users": 4627,
+  "test_targets_users": 4599,
+  "val_events_cold_rows": 1928,
+  "val_events_cold_items": 1639,
+  "test_events_cold_rows": 2332,
+  "test_events_cold_items": 1782,
+  "items_without_embedding": 61146
+}

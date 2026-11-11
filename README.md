@@ -55,21 +55,60 @@ Differences with the official baselines:
   the retriever is trained once on `[0, 25 823 600)` and the validation day is used for early
   stopping and for training the reranker. The retriever therefore sees one day less of data
   than the official baselines, which makes the comparison slightly conservative.
-- The NDCG implementation in `benchmarks/yambda/evaluation/metrics.py` computes the ideal DCG
-  from the hit mask instead of the ideal mask (`ideal_dcg = calc_dcg(target_mask)`), so the
-  official NDCG equals 1 whenever the top-k list contains at least one hit and 0 otherwise.
-  Both values are reported here: `ndcg_official@k` for comparison with the paper and
-  `ndcg@k` with the standard ideal DCG. Recall@k is unaffected and is the primary metric for
-  comparison with the paper.
+### Metric formulas
 
-Reference results from the paper (Yambda-50M, Listen+):
+The current `benchmarks/yambda/evaluation/metrics.py` and the paper tables use different
+formulas. Comments in that file describe two earlier bugs, and its NDCG has a third one.
 
-| Model | NDCG@10 | Recall@10 | Recall@100 |
+| Name | Formula | Source |
+|---|---|---|
+| `recall@k` | mean of hits / min(targets, k) | current `metrics.py` |
+| `recall_paper@k` | mean of hits / targets | paper tables (bug described in `metrics.py`) |
+| `ndcg@k` | mean over users of DCG / ideal DCG | standard definition |
+| `ndcg_paper@k` | sum of DCG / sum of ideal DCG | paper tables (bug described in `metrics.py`) |
+| `ndcg_official@k` | DCG / DCG computed on the hit mask | current `metrics.py` |
+
+The NDCG of the current `metrics.py` builds the ideal mask but then calls
+`ideal_dcg = calc_dcg(target_mask)` on the hit mask, so each user scores 1 when the top-k
+list holds at least one hit and 0 otherwise: it is a hit rate, not an NDCG. Users have 34
+test targets on average, so `recall_paper@k` is much lower than `recall@k` for small k.
+
+The popularity baselines below reproduce the paper tables to the fourth decimal with
+`recall_paper` and `ndcg_paper`, which validates the split, the Listen+ filter and the
+targets. `ndcg_official` does not match the paper. Comparisons with the paper therefore use
+`recall_paper` and `ndcg_paper`; `recall@k` and `ndcg@k` are the main metrics of this project.
+
+### Popularity baselines
+
+Test day, 4,599 users. DecayPop weights each event by 0.9 per 2 hours of age, the period
+being selected on the validation day by `ndcg@100` among 0.5 to 24 hours. Reproduce with `python -m nexttrack.eval.baselines`.
+
+| Model | recall_paper@10 | recall_paper@100 | ndcg_paper@10 | ndcg_paper@100 | recall@10 | ndcg@10 | ndcg_official@10 | coverage@100 |
+|---|---|---|---|---|---|---|---|---|
+| MostPop (paper) | 0.0064 | 0.0321 | 0.0186 | 0.0249 | | | | 0.0002 |
+| MostPop (here) | 0.0064 | 0.0321 | 0.0186 | 0.0249 | 0.0159 | 0.0172 | 0.0931 | 0.0002 |
+| DecayPop (paper) | 0.0122 | 0.0479 | 0.0260 | 0.0323 | | | | 0.0002 |
+| DecayPop (here) | 0.0122 | 0.0479 | 0.0260 | 0.0322 | 0.0250 | 0.0250 | 0.1437 | 0.0002 |
+
+Other reference results from the paper (Listen+, 50M), in paper formulas:
+
+| Model | ndcg_paper@10 | recall_paper@10 | recall_paper@100 |
 |---|---|---|---|
-| MostPop | 0.0186 | 0.0064 | 0.0321 |
-| DecayPop | 0.0260 | 0.0122 | 0.0479 |
 | ItemKNN | 0.0781 | 0.0373 | 0.1297 |
 | SASRec | 0.0748 | 0.0325 | 0.1026 |
+
+### Prepared data in numbers
+
+| Quantity | Value |
+|---|---|
+| Listen+ training events (before `TRAIN_END`) | 29,135,186 |
+| Training users, training items | 9,207, 627,648 |
+| Validation day: users, events | 4,627, 143,557 |
+| Test day: users, events | 4,599, 157,695 |
+| Test targets already in the user history | 68.3 % (24.6 % within the last 200 events) |
+| Test targets never seen in training | 1.48 % (2,332 events, 1,782 tracks, 688 users) |
+| Never-seen test tracks with an audio embedding | 93.4 % |
+| History length before the test day | median 1,787, p90 8,077 |
 
 ## Repository layout
 
@@ -114,6 +153,34 @@ pytest
 
 Spark runs locally (the 50M flat files total about 400 MB compressed). Java 17 or 21 is
 required for Spark 4.
+
+### Data preparation (local)
+
+```bash
+python -m nexttrack.prep.download                 # 14.4 GB into data/raw, embeddings included
+python -m nexttrack.prep.split                    # Spark, writes data/prepared and stats.json
+python -m nexttrack.eval.baselines                # MostPop and DecayPop, writes reports/baselines.json
+```
+
+Every command accepts `--config` and `--set section.key=value`. A smoke run on 300 users:
+
+```bash
+python -m nexttrack.prep.split --set data.max_users=300 paths.prepared=data/smoke
+```
+
+Prepared folders (parquet, one per table):
+
+| Folder | Content |
+|---|---|
+| `item_map` | `item_id`, `item_idx` (1..N, 0 is padding), `train_count`; training items only |
+| `train_events`, `val_events`, `test_events` | Listen+ events with `item_idx` (0 when unseen in training) |
+| `history_val`, `history_test` | per user arrays, events before `TRAIN_END` and before `VAL_END` |
+| `val_targets`, `test_targets` | per user arrays of the validation and test day |
+| `likes`, `dislikes`, `unlikes`, `undislikes` | raw side events of the kept users |
+| `catalogue` | `item_id`, `item_idx`, `embedding` float32[128] for every listened or liked item with audio |
+
+Items whose `item_idx` is 0 in the targets have no Listen+ interaction before `TRAIN_END`;
+they form the cold-start subset of the evaluation.
 
 ## License
 

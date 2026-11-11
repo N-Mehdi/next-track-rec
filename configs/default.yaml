@@ -41,8 +41,8 @@ candidates:
   sasrec: 100
   audio: 50
   decay_pop: 50
-  # Half-life of the popularity decay, in hours.
-  decay_hours: 24
+  # Popularity decay: weight 0.9 per period, in hours (selected on validation).
+  decay_hours: 2
 
 rerank:
   objective: lambdarank

@@ -38,6 +38,27 @@ def test_cold_subset():
     assert result["cold"]["ndcg_official@5"] == pytest.approx(0.5)
 
 
+def test_bootstrap_interval_contains_estimate():
+    rng = np.random.default_rng(1)
+    ranked = rng.integers(0, 50, size=(200, 10))
+    targets = []
+    for _ in range(200):
+        targets.append(rng.integers(0, 50, size=3))
+    train_items = np.arange(0, 40)
+    result = evaluate(ranked, targets, [10], catalogue_size=50, train_items=train_items)
+    for name in ["recall@10", "ndcg@10", "recall_paper@10", "ndcg_paper@10"]:
+        low, high = result["cold_ci95"][name]
+        assert low <= result["cold"][name] <= high
+        assert high - low > 0
+
+
+def test_empty_slots_are_ignored():
+    ranked = np.array([[3, -1, -1], [-1, -1, -1]])
+    result = evaluate(ranked, [np.array([3]), np.array([4])], [3], catalogue_size=4)["all"]
+    assert result["recall@3"] == pytest.approx(0.5)
+    assert result["coverage@3"] == pytest.approx(0.25)
+
+
 def test_no_cold_targets():
     result = evaluate(RANKED, TARGETS, [5], catalogue_size=10, train_items=np.arange(1, 11))
     assert result["cold_users"] == 0

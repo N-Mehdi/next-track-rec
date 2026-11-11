@@ -1,0 +1,55 @@
+# Paths are relative to the repository root unless absolute.
+# On Kaggle, override paths.prepared with the attached dataset folder.
+paths:
+  raw: data/raw
+  prepared: data/prepared
+  checkpoints: checkpoints
+  reports: reports
+
+data:
+  # Main event stream: listens with played_ratio_pct >= 50 (Listen+).
+  stream: listens
+  # Users kept for local smoke tests (null = all users).
+  max_users: null
+
+spark:
+  master: "local[10]"
+  driver_memory: "20g"
+  shuffle_partitions: 64
+
+sasrec:
+  max_seq_len: 200
+  embedding_dim: 128
+  num_layers: 2
+  num_heads: 2
+  dropout: 0.2
+  num_negatives: 1024
+  batch_size: 256
+  learning_rate: 0.001
+  epochs: 20
+  patience: 3
+  # Sliding window stride over each user history, in events.
+  window_stride: 100
+  fp16: true
+
+cold_start:
+  # Number of last listened tracks averaged for the audio query.
+  history_items: 20
+  num_neighbours: 50
+
+candidates:
+  sasrec: 100
+  audio: 50
+  decay_pop: 50
+  # Half-life of the popularity decay, in hours.
+  decay_hours: 24
+
+rerank:
+  objective: lambdarank
+  num_leaves: 63
+  learning_rate: 0.05
+  num_rounds: 500
+  early_stopping_rounds: 30
+
+eval:
+  k_values: [10, 50, 100]

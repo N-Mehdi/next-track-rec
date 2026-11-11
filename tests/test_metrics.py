@@ -29,13 +29,19 @@ def test_metrics_by_hand():
     assert result["coverage@5"] == pytest.approx(1.0)
 
 
-def test_cold_subset():
-    train_items = np.array([1, 2, 3, 4, 5, 6, 7, 8])
-    result = evaluate(RANKED, TARGETS, [5], catalogue_size=10, train_items=train_items)
-    assert result["cold_target_share"] == pytest.approx(0.5)
-    assert result["cold_users"] == 2
-    assert result["cold"]["recall@5"] == pytest.approx(0.5)
-    assert result["cold"]["ndcg_official@5"] == pytest.approx(0.5)
+def test_cold_subsets_per_definition():
+    seen = {"cold_train": np.array([1, 2, 3, 4, 5, 6, 7, 8]), "cold_strict": np.arange(1, 10)}
+    result = evaluate(RANKED, TARGETS, [5], catalogue_size=10, seen_sets=seen)
+    loose = result["cold_train"]
+    assert loose["target_share"] == pytest.approx(0.5)
+    assert loose["users"] == 2
+    assert loose["targets"] == 2
+    assert loose["metrics"]["recall@5"] == pytest.approx(0.5)
+    assert loose["metrics"]["ndcg_official@5"] == pytest.approx(0.5)
+    strict = result["cold_strict"]
+    assert strict["users"] == 1
+    assert strict["targets"] == 1
+    assert strict["metrics"]["recall@5"] == pytest.approx(1.0)
 
 
 def test_bootstrap_interval_contains_estimate():
@@ -45,10 +51,10 @@ def test_bootstrap_interval_contains_estimate():
     for _ in range(200):
         targets.append(rng.integers(0, 50, size=3))
     train_items = np.arange(0, 40)
-    result = evaluate(ranked, targets, [10], catalogue_size=50, train_items=train_items)
+    result = evaluate(ranked, targets, [10], catalogue_size=50, seen_sets={"cold_train": train_items})
     for name in ["recall@10", "ndcg@10", "recall_paper@10", "ndcg_paper@10"]:
-        low, high = result["cold_ci95"][name]
-        assert low <= result["cold"][name] <= high
+        low, high = result["cold_train"]["ci95"][name]
+        assert low <= result["cold_train"]["metrics"][name] <= high
         assert high - low > 0
 
 
@@ -60,6 +66,6 @@ def test_empty_slots_are_ignored():
 
 
 def test_no_cold_targets():
-    result = evaluate(RANKED, TARGETS, [5], catalogue_size=10, train_items=np.arange(1, 11))
-    assert result["cold_users"] == 0
-    assert "cold" not in result
+    result = evaluate(RANKED, TARGETS, [5], catalogue_size=10, seen_sets={"cold_train": np.arange(1, 11)})
+    assert result["cold_train"]["users"] == 0
+    assert "metrics" not in result["cold_train"]

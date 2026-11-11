@@ -7,7 +7,7 @@ import pytest
 
 from nexttrack import constants
 from nexttrack.prep.split import prepare
-from nexttrack.tables import list_column, read_table
+from nexttrack.tables import list_column, read_table, seen_item_sets
 
 T = constants
 GAP_TS = T.TRAIN_END + 100
@@ -127,3 +127,10 @@ def test_catalogue_and_stats(prepared):
     assert stats["item_pool"] == 6
     assert stats["items_without_embedding"] == 1
     assert stats["test_events_cold_rows"] == 1
+
+
+def test_seen_item_sets(prepared):
+    seen = seen_item_sets(prepared)
+    assert sorted(seen["cold_train"].tolist()) == [1, 2]
+    # Track 4 is first listened during the validation day: cold for training only.
+    assert sorted(seen["cold_strict"].tolist()) == [1, 2, 4]

@@ -131,11 +131,27 @@ resamples).
 | MostPop, DecayPop, SASRec | both | 0 | 0 | 0 |
 | History | `cold_train` | 0.0096 [0.0033, 0.0167] | 0.0325 [0.0210, 0.0444] | 0.0064 [0.0026, 0.0114] |
 | History | `cold_strict` | 0 | 0 | 0 |
+| Audio kNN | `cold_train` | 0.0051 [0.0015, 0.0096] | 0.0139 [0.0067, 0.0217] | 0.0058 [0.0019, 0.0107] |
+| Audio kNN | `cold_strict` | 0.0018 [0.0000, 0.0043] | 0.0080 [0.0028, 0.0145] | 0.0019 [0.0000, 0.0046] |
 
 History reaches `cold_train` tracks only because the test history ends at `VAL_END`: a track
 first listened during the validation day is absent from training but present in the
 history. Under `cold_strict` no collaborative model can score, which leaves the audio
 embeddings as the only signal.
+
+Audio kNN (`python -m nexttrack.retrieval.audio_knn`, `reports/audio_knn.json`), no training:
+
+- Query: mean of the normalized audio embeddings of the user's last 5 listened tracks with
+  audio, renormalized. The number of tracks (1, 5, 10, 20, 50 or 200) is selected on the
+  validation day by `ndcg@100` on its never-seen targets; 1 to 20 give close values.
+- Search pool: the 7,128,158 tracks of `embeddings.parquet` absent from training (exact
+  inner product, FAISS). The pool does not depend on the test day; it holds 93.7 % of the
+  `cold_strict` targets. A pool limited to tracks with any event before the test day
+  would hold only 28.9 % of them.
+- On 7.1 M tracks a random top 100 hits a given target with probability 1.4e-5;
+  `recall@100` on `cold_strict` is about 570 times that.
+- Reading the 13.8 GB parquet file once writes a 4 GB float32 copy to `data/audio`. One
+  search over the pool for the 4,599 test users takes about 2 minutes on 12 CPU cores.
 
 ### Prepared data in numbers
 
@@ -201,6 +217,7 @@ required for Spark 4.
 python -m nexttrack.prep.download                 # 14.4 GB into data/raw, embeddings included
 python -m nexttrack.prep.split                    # Spark, writes data/prepared and stats.json
 python -m nexttrack.eval.baselines                # MostPop and DecayPop, writes reports/baselines.json
+python -m nexttrack.retrieval.audio_knn           # audio kNN on never-seen tracks, writes reports/audio_knn.json
 ```
 
 Every command accepts `--config` and `--set section.key=value`. A smoke run on 300 users:

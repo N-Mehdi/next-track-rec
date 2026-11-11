@@ -3,6 +3,8 @@
 paths:
   raw: data/raw
   prepared: data/prepared
+  # Float32 copy of the audio embeddings, built on first use.
+  audio: data/audio
   checkpoints: checkpoints
   outputs: outputs
   reports: reports
@@ -41,11 +43,6 @@ sasrec:
   num_retrieved: 200
   # Smoke tests only; null runs full epochs.
   max_steps_per_epoch: null
-
-cold_start:
-  # Number of last listened tracks averaged for the audio query.
-  history_items: 20
-  num_neighbours: 50
 
 candidates:
   sasrec: 100

@@ -5,6 +5,8 @@ paths:
   prepared: data/prepared
   # Float32 copy of the audio embeddings, built on first use.
   audio: data/audio
+  # Service files written by nexttrack.serve.export.
+  artifacts: artifacts
   checkpoints: checkpoints
   outputs: outputs
   reports: reports
@@ -45,18 +47,31 @@ sasrec:
   max_steps_per_epoch: null
 
 candidates:
+  # Retriever outputs (candidates_val.parquet, candidates_test.parquet, model.pt).
+  sasrec_dir: outputs/a_d128_e60
+  audio_dir: outputs/audio_knn
+  # Quotas of the union, filled up to total with the next SASRec items.
   sasrec: 100
-  audio: 50
-  decay_pop: 50
-  # Popularity decay: weight 0.9 per period, in hours (selected on validation).
-  decay_hours: 2
+  history: 50
+  audio: 30
+  decay_pop: 20
+  total: 200
+  # Decay periods in hours, weight 0.9 per period (selected on validation in phase 1).
+  decay_pop_hours: 2
+  history_hours: 24
+  # Last tracks averaged for the audio query (selected in phase 3).
+  audio_history_items: 5
 
 rerank:
   objective: lambdarank
   num_leaves: 63
   learning_rate: 0.05
+  # Maximum rounds; the number used is chosen by cross-validation on the validation users.
   num_rounds: 500
-  early_stopping_rounds: 30
+  folds: 5
+  seed: 42
+  # Post-processing variant: one position in every audio_every kept for the audio kNN.
+  audio_every: 10
 
 eval:
   k_values: [10, 50, 100]

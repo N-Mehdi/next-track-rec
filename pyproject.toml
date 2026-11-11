@@ -20,7 +20,14 @@ dependencies = [
 # Local data preparation. Spark 4 is required with Java 21.
 prep = ["pyspark>=4.0"]
 # Model training and candidate generation (Kaggle T4 or local GPU).
-train = ["torch>=2.2", "faiss-cpu>=1.8", "lightgbm>=4.3", "onnxmltools>=1.12", "onnx>=1.15"]
+train = [
+    "torch>=2.2",
+    "faiss-cpu>=1.8",
+    "lightgbm>=4.3",
+    "onnxmltools>=1.12",
+    "onnx>=1.15",
+    "onnxruntime>=1.17",
+]
 # CPU inference service.
 serve = ["fastapi>=0.110", "uvicorn>=0.29", "onnxruntime>=1.17", "faiss-cpu>=1.8"]
 dev = ["pytest>=8", "ruff>=0.4"]

@@ -66,11 +66,12 @@ class SASRec(nn.Module):
         batch, length = inputs.shape
         device = inputs.device
         padding = inputs == 0
-        causal = torch.ones(length, length, dtype=torch.bool, device=device).tril()
-        diagonal = torch.eye(length, dtype=torch.bool, device=device)
+        # Masks from position comparisons: they also export to ONNX (no bool EyeLike).
+        positions = torch.arange(length, device=device)
+        causal = positions[None, :] <= positions[:, None]
+        diagonal = positions[None, :] == positions[:, None]
         # A query never sees padded keys, but always sees itself to avoid empty rows.
         allowed = (causal[None] & ~padding[:, None, :]) | diagonal[None]
-        positions = torch.arange(length, device=device)
         x = self.items(inputs) * math.sqrt(self.dim) + self.positions(positions)[None]
         x = self.dropout(x)
         for block in self.blocks:

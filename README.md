@@ -102,6 +102,7 @@ Comparison with the paper (paper formulas):
 | ItemKNN (paper) | 0.0373 | 0.1297 | 0.0781 | 0.0934 | 0.0874 |
 | SASRec (paper) | 0.0325 | 0.1026 | 0.0748 | 0.0764 | 0.0310 |
 | History (here) | 0.1082 | 0.2640 | 0.2172 | 0.2104 | 0.1797 |
+| SASRec A (here) | 0.0457 | 0.1672 | 0.0975 | 0.1214 | 0.1317 |
 
 Main metrics of this project:
 
@@ -110,6 +111,7 @@ Main metrics of this project:
 | MostPop | 0.0159 | 0.0172 | 0.0327 | 0.0216 | 0.0931 |
 | DecayPop | 0.0250 | 0.0250 | 0.0486 | 0.0313 | 0.1437 |
 | History | 0.2054 | 0.2108 | 0.2676 | 0.2155 | 0.4708 |
+| SASRec A | 0.0927 | 0.0944 | 0.1699 | 0.1171 | 0.3838 |
 
 ### Never-seen tracks
 
@@ -126,7 +128,7 @@ resamples).
 
 | Model | Definition | recall@10 | recall@100 | ndcg@10 |
 |---|---|---|---|---|
-| MostPop, DecayPop | both | 0 | 0 | 0 |
+| MostPop, DecayPop, SASRec | both | 0 | 0 | 0 |
 | History | `cold_train` | 0.0096 [0.0033, 0.0167] | 0.0325 [0.0210, 0.0444] | 0.0064 [0.0026, 0.0114] |
 | History | `cold_strict` | 0 | 0 | 0 |
 
@@ -243,6 +245,20 @@ python -m nexttrack.train.train_sasrec --set sasrec.run_name=a_d128
 
 Two configurations only, identical except for the embedding size: A (128) and B (256).
 `notebooks/kaggle/02_sasrec` clones this repository and runs both on the dataset above.
+Results (one T4, fp16, reports in `reports/sasrec_a_d128.json` and `reports/sasrec_b_d256.json`):
+
+| Config | Epochs run, best | Training time | val ndcg@10 | test recall@10 | test ndcg@10 | test recall@100 |
+|---|---|---|---|---|---|---|
+| A, dim 128 | 20, 20 | 57 min | 0.0980 | 0.0927 | 0.0944 | 0.1699 |
+| B, dim 256 | 20, 19 | 88 min | 0.0944 | 0.0914 | 0.0930 | 0.1655 |
+
+A is selected on the validation day. With the paper formulas it reaches
+`recall_paper@10` 0.0457 and `ndcg_paper@10` 0.0975, against 0.0325 and 0.0748 for the paper
+SASRec. It stays well below the History baseline: 68 % of test targets are repeats of the
+user's own history, which a next-item model over the full catalogue ranks less sharply than
+a recency-weighted count. SASRec cannot score tracks absent from training (both cold
+definitions give 0). The candidate union and the reranker combine both sources.
+
 A local smoke run on CPU:
 
 ```bash

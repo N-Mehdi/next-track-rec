@@ -78,24 +78,49 @@ The popularity baselines below reproduce the paper tables to the fourth decimal 
 targets. `ndcg_official` does not match the paper. Comparisons with the paper therefore use
 `recall_paper` and `ndcg_paper`; `recall@k` and `ndcg@k` are the main metrics of this project.
 
-### Popularity baselines
+### Baselines
 
-Test day, 4,599 users. DecayPop weights each event by 0.9 per 2 hours of age, the period
-being selected on the validation day by `ndcg@100` among 0.5 to 24 hours. Reproduce with `python -m nexttrack.eval.baselines`.
+Test day, 4,599 users. Reproduce with `python -m nexttrack.eval.baselines`
+(`reports/baselines.json`).
 
-| Model | recall_paper@10 | recall_paper@100 | ndcg_paper@10 | ndcg_paper@100 | recall@10 | ndcg@10 | ndcg_official@10 | coverage@100 |
-|---|---|---|---|---|---|---|---|---|
-| MostPop (paper) | 0.0064 | 0.0321 | 0.0186 | 0.0249 | | | | 0.0002 |
-| MostPop (here) | 0.0064 | 0.0321 | 0.0186 | 0.0249 | 0.0159 | 0.0172 | 0.0931 | 0.0002 |
-| DecayPop (paper) | 0.0122 | 0.0479 | 0.0260 | 0.0323 | | | | 0.0002 |
-| DecayPop (here) | 0.0122 | 0.0479 | 0.0260 | 0.0322 | 0.0250 | 0.0250 | 0.1437 | 0.0002 |
+- MostPop: global listen counts.
+- DecayPop: global counts, each event weighted by 0.9 per 2 hours of age.
+- History: the tracks of the user's own history, each listen weighted by 0.9 per 24 hours
+  of age before the end of the history. The paper has no repeat-aware baseline.
 
-Other reference results from the paper (Listen+, 50M), in paper formulas:
+Decay periods are selected on the validation day by `ndcg@100` (0.5 to 24 hours for
+DecayPop, 6 hours to 90 days and plain counts for History).
 
-| Model | ndcg_paper@10 | recall_paper@10 | recall_paper@100 |
+Comparison with the paper (paper formulas):
+
+| Model | recall_paper@10 | recall_paper@100 | ndcg_paper@10 | ndcg_paper@100 | coverage@100 |
+|---|---|---|---|---|---|
+| MostPop (paper) | 0.0064 | 0.0321 | 0.0186 | 0.0249 | 0.0002 |
+| MostPop (here) | 0.0064 | 0.0321 | 0.0186 | 0.0249 | 0.0002 |
+| DecayPop (paper) | 0.0122 | 0.0479 | 0.0260 | 0.0323 | 0.0002 |
+| DecayPop (here) | 0.0122 | 0.0479 | 0.0260 | 0.0322 | 0.0002 |
+| ItemKNN (paper) | 0.0373 | 0.1297 | 0.0781 | 0.0934 | 0.0874 |
+| SASRec (paper) | 0.0325 | 0.1026 | 0.0748 | 0.0764 | 0.0310 |
+| History (here) | 0.1082 | 0.2640 | 0.2172 | 0.2104 | 0.1797 |
+
+Main metrics of this project:
+
+| Model | recall@10 | ndcg@10 | recall@100 | ndcg@100 | ndcg_official@10 |
+|---|---|---|---|---|---|
+| MostPop | 0.0159 | 0.0172 | 0.0327 | 0.0216 | 0.0931 |
+| DecayPop | 0.0250 | 0.0250 | 0.0486 | 0.0313 | 0.1437 |
+| History | 0.2054 | 0.2108 | 0.2676 | 0.2155 | 0.4708 |
+
+Never-seen tracks (688 users, 2,332 targets), 95 % bootstrap intervals over users
+(1,000 resamples):
+
+| Model | recall@10 | recall@100 | ndcg@10 |
 |---|---|---|---|
-| ItemKNN | 0.0781 | 0.0373 | 0.1297 |
-| SASRec | 0.0748 | 0.0325 | 0.1026 |
+| MostPop, DecayPop | 0 | 0 | 0 |
+| History | 0.0096 [0.0033, 0.0167] | 0.0325 [0.0210, 0.0444] | 0.0064 [0.0026, 0.0114] |
+
+History reaches some never-seen tracks because the test history ends at `VAL_END`: a track
+first listened during the validation day is absent from training but present in the history.
 
 ### Prepared data in numbers
 
@@ -120,6 +145,7 @@ src/nexttrack/
   prep/                     download and Spark preparation (phase 1)
   data/                     torch datasets (phase 2)
   models/                   SASRec (phase 2)
+  train/                    SASRec training and candidate export (phase 2)
   retrieval/                FAISS index, audio kNN, candidate union (phases 2 and 3)
   rerank/                   features, LightGBM, ONNX export (phase 4)
   eval/                     metrics and evaluation runs (phase 1)
@@ -181,6 +207,35 @@ Prepared folders (parquet, one per table):
 
 Items whose `item_idx` is 0 in the targets have no Listen+ interaction before `TRAIN_END`;
 they form the cold-start subset of the evaluation.
+
+The prepared folders are published as the private Kaggle dataset
+`mehdineji/yambda-50m-prepared`.
+
+### SASRec training (Kaggle T4)
+
+```bash
+python -m nexttrack.train.train_sasrec --set sasrec.run_name=a_d128
+```
+
+- Training windows of 201 events are cut from the end of every training history every 100
+  events (about 300,000 windows), left padded, so the whole history is used and not only
+  the last 200 events.
+- Loss: sampled softmax over 2,048 uniform negatives shared by the batch, item embeddings
+  tied between input and output, fp16 autocast.
+- Early stopping on `ndcg@10` of the validation day (patience 3, at most 20 epochs).
+- Inputs: the last 200 events before `TRAIN_END` for the validation day, before `VAL_END`
+  for the test day. Tracks unseen in training are dropped from the inputs.
+- Outputs in `outputs/<run_name>/`: `model.pt`, `report.json` and the top 200 tracks per
+  target user for both days (`candidates_val.parquet`, `candidates_test.parquet`).
+
+Two configurations only, identical except for the embedding size: A (128) and B (256).
+`notebooks/kaggle/02_sasrec` clones this repository and runs both on the dataset above.
+A local smoke run on CPU:
+
+```bash
+python -m nexttrack.train.train_sasrec --set paths.prepared=data/smoke paths.outputs=data/smoke_outputs \
+    sasrec.embedding_dim=32 sasrec.epochs=2 sasrec.max_steps_per_epoch=10 sasrec.num_negatives=256
+```
 
 ## License
 

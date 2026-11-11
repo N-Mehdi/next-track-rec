@@ -4,6 +4,7 @@ paths:
   raw: data/raw
   prepared: data/prepared
   checkpoints: checkpoints
+  outputs: outputs
   reports: reports
 
 data:
@@ -18,12 +19,14 @@ spark:
   shuffle_partitions: 64
 
 sasrec:
+  run_name: a
   max_seq_len: 200
   embedding_dim: 128
   num_layers: 2
   num_heads: 2
   dropout: 0.2
-  num_negatives: 1024
+  # Uniform negatives shared by the whole batch.
+  num_negatives: 2048
   batch_size: 256
   learning_rate: 0.001
   epochs: 20
@@ -31,6 +34,13 @@ sasrec:
   # Sliding window stride over each user history, in events.
   window_stride: 100
   fp16: true
+  device: auto
+  seed: 42
+  eval_batch_size: 256
+  # Items kept per user for the candidate stage.
+  num_retrieved: 200
+  # Smoke tests only; null runs full epochs.
+  max_steps_per_epoch: null
 
 cold_start:
   # Number of last listened tracks averaged for the audio query.

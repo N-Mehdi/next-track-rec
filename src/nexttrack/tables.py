@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+import pyarrow as pa
 import pyarrow.parquet as pq
 
 
@@ -34,6 +35,21 @@ def read_targets(path):
 
 def read_item_ids(path):
     return read_table(path, ["item_id"]).column("item_id").to_numpy()
+
+
+def write_ranked(path, uids, item_ids, scores):
+    """Parquet with one row per user: uid, item_ids list, scores list (same order)."""
+    rows, width = item_ids.shape
+    offsets = pa.array(np.arange(0, rows * width + 1, width, dtype=np.int32))
+    table = pa.table(
+        {
+            "uid": pa.array(np.asarray(uids, dtype=np.uint32)),
+            "item_ids": pa.ListArray.from_arrays(offsets, pa.array(item_ids.ravel().astype(np.int64))),
+            "scores": pa.ListArray.from_arrays(offsets, pa.array(scores.ravel().astype(np.float32))),
+        }
+    )
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    pq.write_table(table, str(path))
 
 
 def write_json(obj, path):

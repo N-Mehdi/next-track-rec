@@ -14,7 +14,7 @@ import numpy as np
 from nexttrack import constants
 from nexttrack.config import parse_args
 from nexttrack.eval.metrics import evaluate
-from nexttrack.tables import flat_column, list_column, read_item_ids, read_table, write_json
+from nexttrack.tables import flat_column, list_column, read_table, seen_item_sets, write_json
 
 POP_HOURS = [0.5, 1, 2, 3, 6, 12, 24]
 HISTORY_HOURS = [6, 24, 72, 168, 720, 2160]
@@ -76,7 +76,7 @@ def load_split(prepared, split):
     return split_data
 
 
-def run_split(prepared, split, pop_hours, history_hours, k_values, train_items):
+def run_split(prepared, split, pop_hours, history_hours, k_values, seen_sets):
     data = load_split(prepared, split)
     targets = data["targets"]
     catalogue_size = len(np.unique(data["all_items"]))
@@ -85,12 +85,12 @@ def run_split(prepared, split, pop_hours, history_hours, k_values, train_items):
         unique, scores = decayed_scores(data["all_items"], data["all_times"], hours)
         ranked = np.tile(top_items(unique, scores, constants.NUM_RANKED), (len(targets), 1))
         name = "most_pop" if hours is None else "decay_pop_%gh" % hours
-        results[name] = evaluate(ranked, targets, k_values, catalogue_size, train_items)
+        results[name] = evaluate(ranked, targets, k_values, catalogue_size, seen_sets)
         print(split, name, "recall@10=%.4f" % results[name]["all"]["recall@10"], flush=True)
     for hours in history_hours:
         ranked = history_ranking(data["user_items"], data["user_times"], hours, constants.NUM_RANKED)
         name = "history_count" if hours is None else "history_%gh" % hours
-        results[name] = evaluate(ranked, targets, k_values, catalogue_size, train_items)
+        results[name] = evaluate(ranked, targets, k_values, catalogue_size, seen_sets)
         print(split, name, "recall@10=%.4f" % results[name]["all"]["recall@10"], flush=True)
     return results
 
@@ -110,13 +110,15 @@ def main():
     config, _ = parse_args("Popularity and history baselines")
     prepared = Path(config["paths"]["prepared"])
     k_values = config["eval"]["k_values"]
-    train_items = read_item_ids(prepared / "item_map")
+    seen = seen_item_sets(prepared)
+    # On the validation day both definitions coincide: its history ends at TRAIN_END.
+    val_seen = {"cold_train": seen["cold_train"]}
 
     history_grid = [None] + HISTORY_HOURS
-    validation = run_split(prepared, "val", [None] + POP_HOURS, history_grid, k_values, train_items)
+    validation = run_split(prepared, "val", [None] + POP_HOURS, history_grid, k_values, val_seen)
     pop_best = best_hours(validation, "decay_pop", POP_HOURS, "ndcg@100")
     history_best = best_hours(validation, "history", HISTORY_HOURS, "ndcg@100")
-    test = run_split(prepared, "test", [None, pop_best], [history_best], k_values, train_items)
+    test = run_split(prepared, "test", [None, pop_best], [history_best], k_values, seen)
 
     report = {
         "best_decay_pop_hours": pop_best,

@@ -114,20 +114,26 @@ def cold_targets(targets, train_items):
     return kept_users, kept_targets, float(unseen.mean())
 
 
-def evaluate(ranked, targets, k_values, catalogue_size, train_items=None):
-    """Metrics on all targets and, when train_items is given, on never-seen targets with CIs."""
+def evaluate(ranked, targets, k_values, catalogue_size, seen_sets=None):
+    """Metrics on all targets, then on the never-seen targets of each definition, with CIs.
+
+    seen_sets maps a definition name to the items considered seen, for example
+    {"cold_train": training items, "cold_strict": items listened before the test day}.
+    """
     ranked = np.asarray(ranked)
     hits = hit_matrix(ranked, targets)
     result = {"users": len(targets)}
     result["all"] = ranking_metrics(ranked, hits, lengths(targets), k_values, catalogue_size)
-    if train_items is not None:
-        users, subset, share = cold_targets(targets, train_items)
-        result["cold_target_share"] = share
-        result["cold_users"] = len(users)
+    if seen_sets is None:
+        seen_sets = {}
+    for name in seen_sets:
+        users, subset, share = cold_targets(targets, seen_sets[name])
+        part = {"target_share": share, "users": len(users), "targets": int(lengths(subset).sum())}
         if len(users) > 0:
             cold_ranked = ranked[users]
             cold_hits = hit_matrix(cold_ranked, subset)
             cold_lengths = lengths(subset)
-            result["cold"] = ranking_metrics(cold_ranked, cold_hits, cold_lengths, k_values, catalogue_size)
-            result["cold_ci95"] = bootstrap(cold_hits, cold_lengths, k_values)
+            part["metrics"] = ranking_metrics(cold_ranked, cold_hits, cold_lengths, k_values, catalogue_size)
+            part["ci95"] = bootstrap(cold_hits, cold_lengths, k_values)
+        result[name] = part
     return result

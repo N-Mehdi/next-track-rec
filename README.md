@@ -111,16 +111,29 @@ Main metrics of this project:
 | DecayPop | 0.0250 | 0.0250 | 0.0486 | 0.0313 | 0.1437 |
 | History | 0.2054 | 0.2108 | 0.2676 | 0.2155 | 0.4708 |
 
-Never-seen tracks (688 users, 2,332 targets), 95 % bootstrap intervals over users
-(1,000 resamples):
+### Never-seen tracks
 
-| Model | recall@10 | recall@100 | ndcg@10 |
+Two definitions are reported, each on the users that have at least one such target:
+
+| Definition | Seen tracks | Test targets | Users |
 |---|---|---|---|
-| MostPop, DecayPop | 0 | 0 | 0 |
-| History | 0.0096 [0.0033, 0.0167] | 0.0325 [0.0210, 0.0444] | 0.0064 [0.0026, 0.0114] |
+| `cold_train`: no Listen+ event before `TRAIN_END` | 627,648 | 2,332 (1.48 %) | 688 |
+| `cold_strict`: no Listen+ event before `VAL_END` (training, first gap and validation day) | 629,298 | 1,956 (1.24 %) | 602 |
 
-History reaches some never-seen tracks because the test history ends at `VAL_END`: a track
-first listened during the validation day is absent from training but present in the history.
+`cold_strict` is computed from `history_test`; the same set is obtained from the raw
+listens of all users. Values in brackets are 95 % bootstrap intervals over users (1,000
+resamples).
+
+| Model | Definition | recall@10 | recall@100 | ndcg@10 |
+|---|---|---|---|---|
+| MostPop, DecayPop | both | 0 | 0 | 0 |
+| History | `cold_train` | 0.0096 [0.0033, 0.0167] | 0.0325 [0.0210, 0.0444] | 0.0064 [0.0026, 0.0114] |
+| History | `cold_strict` | 0 | 0 | 0 |
+
+History reaches `cold_train` tracks only because the test history ends at `VAL_END`: a track
+first listened during the validation day is absent from training but present in the
+history. Under `cold_strict` no collaborative model can score, which leaves the audio
+embeddings as the only signal.
 
 ### Prepared data in numbers
 

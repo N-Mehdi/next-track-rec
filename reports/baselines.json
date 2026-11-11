@@ -24,89 +24,92 @@
         "ndcg_paper@100": 0.0235964187112782,
         "coverage@100": 0.00015932497195880494
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5932497195880495e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.966248597940247e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015932497195880494
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5932497195880495e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.966248597940247e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015932497195880494
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "decay_pop_0.5h": {
@@ -131,89 +134,92 @@
         "ndcg_paper@100": 0.03029449876875599,
         "coverage@100": 0.00015932497195880494
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5932497195880495e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.966248597940247e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015932497195880494
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5932497195880495e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.966248597940247e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015932497195880494
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "decay_pop_1h": {
@@ -238,89 +244,92 @@
         "ndcg_paper@100": 0.03319217515469058,
         "coverage@100": 0.00015932497195880494
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5932497195880495e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.966248597940247e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015932497195880494
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5932497195880495e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.966248597940247e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015932497195880494
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "decay_pop_2h": {
@@ -345,89 +354,92 @@
         "ndcg_paper@100": 0.03438043257530013,
         "coverage@100": 0.00015932497195880494
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5932497195880495e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.966248597940247e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015932497195880494
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5932497195880495e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.966248597940247e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015932497195880494
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "decay_pop_3h": {
@@ -452,89 +464,92 @@
         "ndcg_paper@100": 0.03421127313631608,
         "coverage@100": 0.00015932497195880494
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5932497195880495e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.966248597940247e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015932497195880494
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5932497195880495e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.966248597940247e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015932497195880494
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "decay_pop_6h": {
@@ -559,89 +574,92 @@
         "ndcg_paper@100": 0.03410710447960065,
         "coverage@100": 0.00015932497195880494
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5932497195880495e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.966248597940247e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015932497195880494
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5932497195880495e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.966248597940247e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015932497195880494
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "decay_pop_12h": {
@@ -666,89 +684,92 @@
         "ndcg_paper@100": 0.0340145651941718,
         "coverage@100": 0.00015932497195880494
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5932497195880495e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.966248597940247e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015932497195880494
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5932497195880495e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.966248597940247e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015932497195880494
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "decay_pop_24h": {
@@ -773,89 +794,92 @@
         "ndcg_paper@100": 0.03321410091295627,
         "coverage@100": 0.00015932497195880494
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5932497195880495e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.966248597940247e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015932497195880494
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5932497195880495e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.966248597940247e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015932497195880494
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "history_count": {
@@ -880,89 +904,92 @@
         "ndcg_paper@100": 0.16149581057071508,
         "coverage@100": 0.16413499286224126
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 0.008378900275313551,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 0.033866116039563576,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.05840375497093912
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 0.008378900275313551,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 0.033866116039563576,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.05840375497093912
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "history_6h": {
@@ -987,89 +1014,92 @@
         "ndcg_paper@100": 0.19483373230297982,
         "coverage@100": 0.1848488324666055
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 0.009342816355664321,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 0.03834792750076476,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.06632220607729174
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 0.009342816355664321,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 0.03834792750076476,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.06632220607729174
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "history_24h": {
@@ -1094,89 +1124,92 @@
         "ndcg_paper@100": 0.21221577490049937,
         "coverage@100": 0.1808083511777302
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 0.00890307943305802,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 0.03697454624247986,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.0645791908840624
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 0.00890307943305802,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 0.03697454624247986,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.0645791908840624
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "history_72h": {
@@ -1201,89 +1234,92 @@
         "ndcg_paper@100": 0.21751339050909702,
         "coverage@100": 0.17461220301825228
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 0.008684804221474458,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 0.0356362164780259,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.06211443356785969
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 0.008684804221474458,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 0.0356362164780259,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.06211443356785969
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "history_168h": {
@@ -1308,89 +1344,92 @@
         "ndcg_paper@100": 0.20781133207535885,
         "coverage@100": 0.16978943611705924
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 0.008490427755684715,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 0.0346627408993576,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.060447894361170595
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 0.008490427755684715,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 0.0346627408993576,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.060447894361170595
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "history_720h": {
@@ -1415,89 +1454,92 @@
         "ndcg_paper@100": 0.1778356466325426,
         "coverage@100": 0.16653920668909963
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 0.008442630264097074,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 0.034098730498623435,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.059402722545120835
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 0.008442630264097074,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 0.034098730498623435,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.059402722545120835
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "history_2160h": {
@@ -1522,89 +1564,92 @@
         "ndcg_paper@100": 0.16753388601238792,
         "coverage@100": 0.16597838278780463
       },
-      "cold_target_share": 0.013430205423629639,
-      "cold_users": 644,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 0.008375713775874375,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 0.03417839298460283,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.05909363209952075
-      },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_train": {
+        "target_share": 0.013430205423629639,
+        "users": 644,
+        "targets": 1928,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 0.008375713775874375,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 0.03417839298460283,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.05909363209952075
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     }
   },
@@ -1631,89 +1676,179 @@
         "ndcg_paper@100": 0.02490288719301297,
         "coverage@100": 0.00015890722678285962
       },
-      "cold_target_share": 0.014788040204191636,
-      "cold_users": 688,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5890722678285963e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.945361339142981e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015890722678285962
+      "cold_train": {
+        "target_share": 0.014788040204191636,
+        "users": 688,
+        "targets": 2332,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5890722678285963e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.945361339142981e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015890722678285962
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_strict": {
+        "target_share": 0.012403690668695901,
+        "users": 602,
+        "targets": 1956,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5890722678285963e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.945361339142981e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015890722678285962
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "decay_pop_2h": {
@@ -1738,89 +1873,179 @@
         "ndcg_paper@100": 0.032245747834304804,
         "coverage@100": 0.00015890722678285962
       },
-      "cold_target_share": 0.014788040204191636,
-      "cold_users": 688,
-      "cold": {
-        "recall@10": 0.0,
-        "recall_paper@10": 0.0,
-        "ndcg@10": 0.0,
-        "ndcg_official@10": 0.0,
-        "ndcg_paper@10": 0.0,
-        "coverage@10": 1.5890722678285963e-05,
-        "recall@50": 0.0,
-        "recall_paper@50": 0.0,
-        "ndcg@50": 0.0,
-        "ndcg_official@50": 0.0,
-        "ndcg_paper@50": 0.0,
-        "coverage@50": 7.945361339142981e-05,
-        "recall@100": 0.0,
-        "recall_paper@100": 0.0,
-        "ndcg@100": 0.0,
-        "ndcg_official@100": 0.0,
-        "ndcg_paper@100": 0.0,
-        "coverage@100": 0.00015890722678285962
+      "cold_train": {
+        "target_share": 0.014788040204191636,
+        "users": 688,
+        "targets": 2332,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5890722678285963e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.945361339142981e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015890722678285962
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       },
-      "cold_ci95": {
-        "recall@10": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@10": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@10": [
-          0.0,
-          0.0
-        ],
-        "recall@50": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@50": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@50": [
-          0.0,
-          0.0
-        ],
-        "recall@100": [
-          0.0,
-          0.0
-        ],
-        "recall_paper@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_official@100": [
-          0.0,
-          0.0
-        ],
-        "ndcg_paper@100": [
-          0.0,
-          0.0
-        ]
+      "cold_strict": {
+        "target_share": 0.012403690668695901,
+        "users": 602,
+        "targets": 1956,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 1.5890722678285963e-05,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 7.945361339142981e-05,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.00015890722678285962
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     },
     "history_24h": {
@@ -1845,89 +2070,179 @@
         "ndcg_paper@100": 0.21036823228908894,
         "coverage@100": 0.1797494986476995
       },
-      "cold_target_share": 0.014788040204191636,
-      "cold_users": 688,
-      "cold": {
-        "recall@10": 0.009560723514211887,
-        "recall_paper@10": 0.008690474618431792,
-        "ndcg@10": 0.006378948749546081,
-        "ndcg_official@10": 0.0188953488372093,
-        "ndcg_paper@10": 0.007859092610534264,
-        "coverage@10": 0.009400951536473976,
-        "recall@50": 0.026653981557229426,
-        "recall_paper@50": 0.026641428703106804,
-        "ndcg@50": 0.010434712409811446,
-        "ndcg_official@50": 0.0436046511627907,
-        "ndcg_paper@50": 0.012904877056928221,
-        "coverage@50": 0.03847779589320163,
-        "recall@100": 0.03252459592348333,
-        "recall_paper@100": 0.03252459592348333,
-        "ndcg@100": 0.011500798377014135,
-        "ndcg_official@100": 0.05377906976744186,
-        "ndcg_paper@100": 0.01377831594454244,
-        "coverage@100": 0.06672991174292625
+      "cold_train": {
+        "target_share": 0.014788040204191636,
+        "users": 688,
+        "targets": 2332,
+        "metrics": {
+          "recall@10": 0.009560723514211887,
+          "recall_paper@10": 0.008690474618431792,
+          "ndcg@10": 0.006378948749546081,
+          "ndcg_official@10": 0.0188953488372093,
+          "ndcg_paper@10": 0.007859092610534264,
+          "coverage@10": 0.009400951536473976,
+          "recall@50": 0.026653981557229426,
+          "recall_paper@50": 0.026641428703106804,
+          "ndcg@50": 0.010434712409811446,
+          "ndcg_official@50": 0.0436046511627907,
+          "ndcg_paper@50": 0.012904877056928221,
+          "coverage@50": 0.03847779589320163,
+          "recall@100": 0.03252459592348333,
+          "recall_paper@100": 0.03252459592348333,
+          "ndcg@100": 0.011500798377014135,
+          "ndcg_official@100": 0.05377906976744186,
+          "ndcg_paper@100": 0.01377831594454244,
+          "coverage@100": 0.06672991174292625
+        },
+        "ci95": {
+          "recall@10": [
+            0.00331031976744186,
+            0.016701388888888887
+          ],
+          "recall_paper@10": [
+            0.0026564232134236765,
+            0.015760099951458453
+          ],
+          "ndcg@10": [
+            0.0026255071265192348,
+            0.011417964336781158
+          ],
+          "ndcg_official@10": [
+            0.00872093023255814,
+            0.030523255813953487
+          ],
+          "ndcg_paper@10": [
+            0.0032132791361410016,
+            0.013528239306159217
+          ],
+          "recall@50": [
+            0.016345610912532057,
+            0.03827553803514981
+          ],
+          "recall_paper@50": [
+            0.0163333718797625,
+            0.03826267135967412
+          ],
+          "ndcg@50": [
+            0.006227012295055969,
+            0.01566633222819082
+          ],
+          "ndcg_official@50": [
+            0.029069767441860465,
+            0.061046511627906974
+          ],
+          "ndcg_paper@50": [
+            0.006782241871595099,
+            0.020825090445634093
+          ],
+          "recall@100": [
+            0.020983295941147534,
+            0.04442112851150266
+          ],
+          "recall_paper@100": [
+            0.020983295941147534,
+            0.04442112851150266
+          ],
+          "ndcg@100": [
+            0.006982726140480778,
+            0.016703997445065413
+          ],
+          "ndcg_official@100": [
+            0.0377906976744186,
+            0.07122093023255814
+          ],
+          "ndcg_paper@100": [
+            0.007538854984090453,
+            0.02171967820387323
+          ]
+        }
       },
-      "cold_ci95": {
-        "recall@10": [
-          0.00331031976744186,
-          0.016701388888888887
-        ],
-        "recall_paper@10": [
-          0.0026564232134236765,
-          0.015760099951458453
-        ],
-        "ndcg@10": [
-          0.0026255071265192348,
-          0.011417964336781158
-        ],
-        "ndcg_official@10": [
-          0.00872093023255814,
-          0.030523255813953487
-        ],
-        "ndcg_paper@10": [
-          0.0032132791361410016,
-          0.013528239306159217
-        ],
-        "recall@50": [
-          0.016345610912532057,
-          0.03827553803514981
-        ],
-        "recall_paper@50": [
-          0.0163333718797625,
-          0.03826267135967412
-        ],
-        "ndcg@50": [
-          0.006227012295055969,
-          0.01566633222819082
-        ],
-        "ndcg_official@50": [
-          0.029069767441860465,
-          0.061046511627906974
-        ],
-        "ndcg_paper@50": [
-          0.006782241871595099,
-          0.020825090445634093
-        ],
-        "recall@100": [
-          0.020983295941147534,
-          0.04442112851150266
-        ],
-        "recall_paper@100": [
-          0.020983295941147534,
-          0.04442112851150266
-        ],
-        "ndcg@100": [
-          0.006982726140480778,
-          0.016703997445065413
-        ],
-        "ndcg_official@100": [
-          0.0377906976744186,
-          0.07122093023255814
-        ],
-        "ndcg_paper@100": [
-          0.007538854984090453,
-          0.02171967820387323
-        ]
+      "cold_strict": {
+        "target_share": 0.012403690668695901,
+        "users": 602,
+        "targets": 1956,
+        "metrics": {
+          "recall@10": 0.0,
+          "recall_paper@10": 0.0,
+          "ndcg@10": 0.0,
+          "ndcg_official@10": 0.0,
+          "ndcg_paper@10": 0.0,
+          "coverage@10": 0.008390301574134989,
+          "recall@50": 0.0,
+          "recall_paper@50": 0.0,
+          "ndcg@50": 0.0,
+          "ndcg_official@50": 0.0,
+          "ndcg_paper@50": 0.0,
+          "coverage@50": 0.03501520742160312,
+          "recall@100": 0.0,
+          "recall_paper@100": 0.0,
+          "ndcg@100": 0.0,
+          "ndcg_official@100": 0.0,
+          "ndcg_paper@100": 0.0,
+          "coverage@100": 0.061430355729717875
+        },
+        "ci95": {
+          "recall@10": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@10": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@10": [
+            0.0,
+            0.0
+          ],
+          "recall@50": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@50": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@50": [
+            0.0,
+            0.0
+          ],
+          "recall@100": [
+            0.0,
+            0.0
+          ],
+          "recall_paper@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_official@100": [
+            0.0,
+            0.0
+          ],
+          "ndcg_paper@100": [
+            0.0,
+            0.0
+          ]
+        }
       }
     }
   }

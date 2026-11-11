@@ -37,6 +37,18 @@ def read_item_ids(path):
     return read_table(path, ["item_id"]).column("item_id").to_numpy()
 
 
+def seen_item_sets(prepared):
+    """Items seen under both cold-start definitions.
+
+    cold_train: Listen+ items of the training period (item_map).
+    cold_strict: Listen+ items of every history before the test day (history_test, which
+    ends at VAL_END and covers training, first gap and validation day).
+    """
+    prepared = Path(prepared)
+    strict = np.unique(flat_column(read_table(prepared / "history_test", ["item_ids"]), "item_ids"))
+    return {"cold_train": read_item_ids(prepared / "item_map"), "cold_strict": strict}
+
+
 def write_ranked(path, uids, item_ids, scores):
     """Parquet with one row per user: uid, item_ids list, scores list (same order)."""
     rows, width = item_ids.shape

@@ -17,7 +17,7 @@ from nexttrack.config import parse_args
 from nexttrack.data.sequences import align, last_inputs, make_windows, read_histories, read_index_map
 from nexttrack.eval.metrics import evaluate
 from nexttrack.models.sasrec import SASRec
-from nexttrack.tables import read_targets, to_builtin, write_json, write_ranked
+from nexttrack.tables import read_targets, seen_item_sets, to_builtin, write_json, write_ranked
 
 
 def pick_device(name):
@@ -78,10 +78,10 @@ def train_epoch(model, optimizer, scaler, windows, cfg, device, fp16):
     return total / max(steps, 1)
 
 
-def score_split(model, inputs, targets, lookup, cfg, device, fp16, k_values, train_items):
+def score_split(model, inputs, targets, lookup, cfg, device, fp16, k_values, seen_sets):
     idx, scores = rank(model, inputs, cfg["num_retrieved"], cfg["eval_batch_size"], device, fp16)
     item_ids = lookup[idx]
-    metrics = evaluate(item_ids[:, : constants.NUM_RANKED], targets, k_values, len(lookup) - 1, train_items)
+    metrics = evaluate(item_ids[:, : constants.NUM_RANKED], targets, k_values, len(lookup) - 1, seen_sets)
     return metrics, item_ids, scores
 
 
@@ -156,10 +156,10 @@ def main():
 
     model.load_state_dict(best_state)
     val_metrics, val_items, val_scores = score_split(
-        model, val_inputs, val_targets, lookup, cfg, device, fp16, k_values, train_items
+        model, val_inputs, val_targets, lookup, cfg, device, fp16, k_values, {"cold_train": train_items}
     )
     test_metrics, test_items, test_scores = score_split(
-        model, test_inputs, test_targets, lookup, cfg, device, fp16, k_values, train_items
+        model, test_inputs, test_targets, lookup, cfg, device, fp16, k_values, seen_item_sets(prepared)
     )
     write_ranked(out_dir / "candidates_val.parquet", val_uids, val_items, val_scores)
     write_ranked(out_dir / "candidates_test.parquet", test_uids, test_items, test_scores)
@@ -168,6 +168,7 @@ def main():
     report = {
         "config": cfg,
         "device": torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu",
+        "visible_gpus": torch.cuda.device_count(),
         "train_seconds": train_seconds,
         "best_epoch": best_epoch,
         "epochs": log,

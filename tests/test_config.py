@@ -13,10 +13,10 @@ def test_default_config_loads():
 
 
 def test_overrides_are_typed():
-    config = load_config(DEFAULT, ["sasrec.epochs=3", "sasrec.fp16=false", "data.max_users=500"])
+    config = load_config(DEFAULT, ["sasrec.epochs=3", "sasrec.fp16=false", "split.shift_days=30"])
     assert config["sasrec"]["epochs"] == 3
     assert config["sasrec"]["fp16"] is False
-    assert config["data"]["max_users"] == 500
+    assert config["split"]["shift_days"] == 30
 
 
 def test_set_dotted_creates_sections():

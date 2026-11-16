@@ -22,3 +22,12 @@ def test_ranking_constants():
     assert constants.NUM_CANDIDATES >= constants.NUM_RANKED
     assert constants.PADDING_INDEX == 0
     assert constants.LISTEN_THRESHOLD_PCT == 50
+
+
+def test_shifted_split_moves_every_boundary():
+    official = constants.split_bounds(0)
+    assert official["train_end"] == constants.TRAIN_END
+    assert official["test_last"] == constants.LAST_TIMESTAMP
+    shifted = constants.split_bounds(30)
+    for name in official:
+        assert official[name] - shifted[name] == 30 * constants.DAY_SECONDS

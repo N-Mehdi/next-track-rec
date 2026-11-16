@@ -81,3 +81,12 @@ rerank:
 
 eval:
   k_values: [10, 50, 100]
+
+tracking:
+  # Every reranker training is logged to the local MLflow of docker-compose.yml.
+  enabled: true
+  uri: http://localhost:5000
+  model_name: nexttrack-reranker
+  # Promotion to production publishes the model there for the deployed service.
+  hf_repo: N-Mehdi/nexttrack-reranker
+  hf_private: true

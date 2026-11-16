@@ -222,6 +222,7 @@ src/nexttrack/
   constants.py              split boundaries, Listen+ threshold, k values
   config.py                 YAML loading with dotted overrides
   pipeline.py               one command for the offline pipeline, manifest (MLOps phase)
+  tracking.py               MLflow runs, registry, aliases, publication (MLOps phase)
   prep/                     download and Spark preparation (phase 1)
   data/                     SASRec training windows and inputs (phase 2)
   models/                   SASRec (phase 2)
@@ -235,6 +236,7 @@ tests/                      unit tests; tests/data holds the frozen non-regressi
 notebooks/kaggle/           thin runner that clones this repository (SASRec on a T4)
 reports/                    JSON reports behind every table of this file, pipeline manifest
 Dockerfile                  CPU image of the service
+docker-compose.yml          local MLflow (experiments, registry, aliases)
 ```
 
 ## Phases
@@ -426,6 +428,31 @@ decimals, which keeps two distinct values from being adjacent float32 numbers, b
 LightGBM can still place a threshold within float32 precision of a frequent value: 20 of
 919,800 test rows differ by more than 1e-4, and the test `ndcg@10` computed from the ONNX
 scores is equal to the LightGBM one to the fourth decimal (0.2453).
+
+## Experiment tracking and model registry (MLflow, local)
+
+```bash
+docker compose up -d mlflow                       # http://localhost:5000, data in ./mlflow
+python -m nexttrack.tracking import-sasrec reports/sasrec_*.json
+python -m nexttrack.tracking alias staging 3      # point an alias to a registered version
+python -m nexttrack.tracking promote 3            # production alias, then publication
+python -m nexttrack.tracking download production DIR
+```
+
+The local MLflow server (SQLite, artifacts on disk, `docker-compose.yml`) is the source
+of truth for experiments, registered versions and aliases.
+
+- `sasrec` experiment: the Kaggle runs, imported from their reports (configuration,
+  loss and validation `ndcg@10` per epoch, final metrics).
+- `reranker` experiment: every training of `rerank.train_reranker` is logged
+  (`tracking.enabled`): configuration, test metrics with the never-seen subset, number of
+  rounds, ONNX parity, fingerprints of the prepared data and of the SASRec outputs, and
+  the files the service needs (`reranker.onnx`, `reranker.txt`, `settings.json`). Each
+  run registers a new version of `nexttrack-reranker`.
+- Aliases `staging` and `production`. `promote` moves `production`, then publishes the
+  files of that version to the Hugging Face repository `tracking.hf_repo`, tagged
+  `v<version>`, with the token of the `HF_TOKEN` environment variable. The deployed
+  service downloads the model from there at start.
 
 ## Continuous integration
 

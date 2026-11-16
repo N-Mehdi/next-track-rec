@@ -228,7 +228,12 @@ def main():
         "saved_model_max_abs_gap": float(np.abs(saved_scores - scores).max()),
         "onnx_test_ndcg@10": onnx_ndcg,
     }
-    write_json(to_builtin(report), Path(config["paths"]["reports"]) / "reranker.json")
+    report = to_builtin(report)
+    write_json(report, Path(config["paths"]["reports"]) / "reranker.json")
+    if config["tracking"]["enabled"]:
+        from nexttrack.tracking import log_reranker
+
+        log_reranker(config, report, out_dir)
     print("test", test_metrics["all"], flush=True)
     print("onnx rows differing", int((onnx_gap > 1e-4).sum()), "onnx ndcg@10", onnx_ndcg)
 

@@ -83,6 +83,7 @@ def train(data, cfg):
         # Same trees on every run with the same thread count.
         "deterministic": True,
         "force_row_wise": True,
+        "num_threads": cfg.get("num_threads", 0),
         "verbose": -1,
     }
     folds = user_folds(data, cfg["folds"], cfg["seed"])

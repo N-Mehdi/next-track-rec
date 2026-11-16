@@ -230,5 +230,6 @@ __pycache__/
 *.pth
 *.faiss
 *.npz
+!/tests/data/*.npz
 .vscode/
 /artifacts/

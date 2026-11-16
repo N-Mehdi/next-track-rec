@@ -70,6 +70,8 @@ rerank:
   num_rounds: 500
   folds: 5
   seed: 42
+  # 0 uses every core; the non-regression check uses 1.
+  num_threads: 0
   # Post-processing variant: one position in every audio_every kept for the audio kNN.
   audio_every: 10
 

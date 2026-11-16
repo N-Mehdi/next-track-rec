@@ -1,9 +1,10 @@
 """Non-regression check of the reranker on a small frozen set.
 
 The frozen set holds the candidates, features and targets of 600 users of the validation
-day (never the test day). The reranker is trained with the current code on the first 400
-users and scored on the last 200. The check fails when ndcg@10 falls more than the
-tolerance below the stored reference, or when the ONNX copy ranks differently.
+day (never the test day), for the production variant of the reranker. The reranker is
+trained with the current code on the first 400 users and scored on the last 200. The check
+fails when ndcg@10 falls more than the tolerance below the stored reference, or when the
+ONNX copy ranks differently.
 
   python -m nexttrack.eval.regression            check, exit code 1 on regression
   python -m nexttrack.eval.regression --freeze   rebuild the frozen set (needs data/prepared)
@@ -17,7 +18,7 @@ from pathlib import Path
 
 import numpy as np
 
-from nexttrack.config import copy_config, parse_args
+from nexttrack.config import copy_config, parse_args, production_config
 from nexttrack.eval.metrics import evaluate, lengths
 from nexttrack.rerank.train_reranker import export_onnx, offsets_of, ranked_matrix, train
 
@@ -44,6 +45,7 @@ def freeze(config):
     FROZEN.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
         FROZEN,
+        names=np.array(day["names"]),
         sizes=day["sizes"][users],
         items=day["items"][rows],
         features=day["features"][rows],
@@ -60,7 +62,7 @@ def part(data, start, stop):
     targets = []
     for i in range(start, stop):
         targets.append(data["targets"][cuts[i] : cuts[i + 1]])
-    out = {"sizes": data["sizes"][start:stop], "targets": targets}
+    out = {"sizes": data["sizes"][start:stop], "targets": targets, "names": list(data["names"])}
     for name in ["items", "features", "labels"]:
         out[name] = data[name][rows[start] : rows[stop]]
     return out
@@ -101,6 +103,7 @@ def add_arguments(parser):
 
 def main():
     config, args = parse_args("Reranker non-regression check", add_arguments)
+    config = production_config(config)
     if args.freeze:
         freeze(config)
     values = measure(dict(np.load(FROZEN)), config["rerank"])

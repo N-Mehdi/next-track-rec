@@ -14,8 +14,12 @@ paths:
 data:
   # Main event stream: listens with played_ratio_pct >= 50 (Listen+).
   stream: listens
-  # Users kept for local smoke tests (null = all users).
-  max_users: null
+  # Hub revision of yandex/yambda the raw files come from.
+  revision: dd6f3a19eef5866e346c3270e098baa641a44948
+
+split:
+  # 0 is the official split; 30 moves every boundary 30 days earlier (replay, phase MLOps).
+  shift_days: 0
 
 spark:
   master: "local[10]"

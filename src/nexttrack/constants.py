@@ -29,6 +29,20 @@ VAL_END = TEST_START - GAP_SECONDS
 VAL_START = VAL_END - DAY_SECONDS
 TRAIN_END = VAL_START - GAP_SECONDS
 
+
+def split_bounds(shift_days=0):
+    """Split boundaries moved shift_days earlier; 0 gives the official split."""
+    shift = shift_days * DAY_SECONDS
+    return {
+        "train_end": TRAIN_END - shift,
+        "val_start": VAL_START - shift,
+        "val_end": VAL_END - shift,
+        "test_start": TEST_START - shift,
+        # The last event of the dataset is at LAST_TIMESTAMP: the test day is bounded.
+        "test_last": LAST_TIMESTAMP - shift,
+    }
+
+
 # Listen+ : a listen counts when at least half of the track was played.
 LISTEN_THRESHOLD_PCT = 50
 

@@ -39,19 +39,6 @@ def write(df, path, partitions):
     df.coalesce(partitions).write.mode("overwrite").parquet(str(path))
 
 
-def pick_users(listens, max_users):
-    """Smallest uids, used for smoke tests. None keeps every user."""
-    if max_users is None:
-        return None
-    return listens.select("uid").distinct().orderBy("uid").limit(int(max_users))
-
-
-def keep_users(df, users):
-    if users is None:
-        return df
-    return df.join(F.broadcast(users), "uid")
-
-
 def sequences(df):
     """One row per user with chronological arrays."""
     event = F.struct("timestamp", "item_idx", "item_id", "is_organic")
@@ -65,20 +52,20 @@ def sequences(df):
     )
 
 
-def prepare(spark, raw_dir, out_dir, max_users=None):
+def prepare(spark, raw_dir, out_dir, shift_days=0):
+    """Official split, or the same split moved shift_days earlier (replay of past days)."""
     raw_dir = Path(raw_dir)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    bounds = constants.split_bounds(shift_days)
     ts = F.col("timestamp")
 
     listens = spark.read.parquet(str(raw_dir / "flat" / "50m" / "listens.parquet"))
-    users = pick_users(listens, max_users)
-    listens = keep_users(listens, users)
     events = listens.filter(F.col("played_ratio_pct") >= constants.LISTEN_THRESHOLD_PCT)
     events = events.select("uid", "item_id", "timestamp", "is_organic")
 
     # Item index from training interactions only.
-    train = events.filter(ts < constants.TRAIN_END)
+    train = events.filter(ts < bounds["train_end"])
     item_map = train.groupBy("item_id").agg(F.count("*").alias("train_count"))
     item_map = item_map.withColumn("item_idx", F.row_number().over(Window.orderBy("item_id")))
     write(item_map.select("item_id", "item_idx", "train_count"), out_dir / "item_map", 1)
@@ -90,10 +77,11 @@ def prepare(spark, raw_dir, out_dir, max_users=None):
         return df.join(index, "item_id", "left").fillna({"item_idx": 0})
 
     train = with_index(train)
-    in_val = (ts >= constants.VAL_START) & (ts < constants.VAL_END)
+    in_val = (ts >= bounds["val_start"]) & (ts < bounds["val_end"])
+    in_test = (ts >= bounds["test_start"]) & (ts <= bounds["test_last"])
     val = with_index(events.filter(in_val).join(train_users, "uid"))
-    test = with_index(events.filter(ts >= constants.TEST_START).join(train_users, "uid"))
-    before_test = with_index(events.filter(ts < constants.VAL_END).join(train_users, "uid"))
+    test = with_index(events.filter(in_test).join(train_users, "uid"))
+    before_test = with_index(events.filter(ts < bounds["val_end"]).join(train_users, "uid"))
 
     write(train, out_dir / "train_events", 8)
     write(val, out_dir / "val_events", 1)
@@ -105,7 +93,7 @@ def prepare(spark, raw_dir, out_dir, max_users=None):
 
     for name in SIDE_EVENTS:
         side = spark.read.parquet(str(raw_dir / "flat" / "50m" / (name + ".parquet")))
-        write(keep_users(side, users), out_dir / name, 1)
+        write(side, out_dir / name, 1)
 
     # Audio catalogue: every item listened or liked by the kept users.
     likes = spark.read.parquet(str(out_dir / "likes"))
@@ -139,7 +127,7 @@ def collect_stats(spark, out_dir, pool_size):
 def main():
     config, _ = parse_args("Prepare Yambda-50M with Spark")
     spark = build_spark(config)
-    stats = prepare(spark, config["paths"]["raw"], config["paths"]["prepared"], config["data"]["max_users"])
+    stats = prepare(spark, config["paths"]["raw"], config["paths"]["prepared"], config["split"]["shift_days"])
     print(json.dumps(stats, indent=2))
     spark.stop()
 

@@ -56,7 +56,8 @@ def main():
     history = read_table(prepared / "history_test", ["item_ids", "timestamps"])
     items = flat_column(history, "item_ids")
     times = flat_column(history, "timestamps")
-    tables = item_tables(config, prepared, items, times, constants.VAL_END)
+    cutoff = constants.split_bounds(config["split"]["shift_days"])["val_end"]
+    tables = item_tables(config, prepared, items, times, cutoff)
     tables["idx_to_id"] = read_index_map(prepared / "item_map")
     np.savez(out_dir / "tables.npz", **tables)
     shutil.copy(Path(paths["outputs"]) / "rerank" / "reranker.onnx", out_dir / "reranker.onnx")

@@ -36,7 +36,6 @@ FEATURES = [
     "history_length",
 ]
 RECENT_EVENTS = 200
-CUTOFFS = {"val": constants.TRAIN_END, "test": constants.VAL_END}
 
 
 def merge_sources(lists, total):
@@ -150,7 +149,9 @@ def load_day(config, split):
     """Everything the features of one day need, read once."""
     paths = config["paths"]
     prepared = Path(paths["prepared"])
-    cutoff = CUTOFFS[split]
+    bounds = constants.split_bounds(config["split"]["shift_days"])
+    # Validation features use events before TRAIN_END, test features events before VAL_END.
+    cutoff = bounds["train_end"] if split == "val" else bounds["val_end"]
     history = read_table(prepared / ("history_" + split), ["uid", "item_ids", "timestamps"])
     targets = read_table(prepared / (split + "_targets"), ["uid", "item_ids"])
     target_uids = targets.column("uid").to_numpy()

@@ -6,7 +6,7 @@ from nexttrack import constants
 from nexttrack.config import parse_args
 
 
-def download(raw_dir, with_embeddings=True):
+def download(raw_dir, revision, with_embeddings=True):
     """Fetch the flat 50m files, the mappings and optionally the 13.8 GB embeddings."""
     names = list(constants.FLAT_FILES)
     names.append(constants.ALBUM_FILE)
@@ -19,6 +19,7 @@ def download(raw_dir, with_embeddings=True):
             repo_id=constants.HF_REPO_ID,
             repo_type="dataset",
             filename=name,
+            revision=revision,
             local_dir=raw_dir,
         )
         print(path, flush=True)
@@ -32,7 +33,7 @@ def add_arguments(parser):
 
 def main():
     config, args = parse_args("Download Yambda-50M", add_arguments)
-    download(config["paths"]["raw"], with_embeddings=not args.skip_embeddings)
+    download(config["paths"]["raw"], config["data"]["revision"], with_embeddings=not args.skip_embeddings)
 
 
 if __name__ == "__main__":

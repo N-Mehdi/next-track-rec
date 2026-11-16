@@ -1,0 +1,15 @@
+{
+  "id": "mehdineji/next-track-rec-03-sasrec-d30",
+  "title": "next-track-rec 03 sasrec d30",
+  "code_file": "sasrec_d30.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "mehdineji/yambda-50m-prepared-d30"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}

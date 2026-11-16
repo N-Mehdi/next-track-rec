@@ -349,6 +349,10 @@ Results on one T4, fp16 (reports in `reports/sasrec_*.json`):
 | B, dim 256, 20 epochs max | 20, 19 | 88 min | 0.0944 | 0.0914 | 0.0930 | 0.1655 |
 | A, dim 128, 60 epochs max | 35, 32 | 100 min | 0.1089 | 0.1012 | 0.1049 | 0.1797 |
 
+`notebooks/kaggle/03_sasrec_d30` trains the same configuration A on
+`yambda-50m-prepared-d30`, the split moved 30 days earlier (`split.shift_days=30`): this
+retriever has not seen the 30 days replayed by the closed loop.
+
 A with 60 epochs is selected on the validation day and feeds the reranker. With the paper
 formulas it reaches `recall_paper@10` 0.0499 and `ndcg_paper@10` 0.1085, against 0.0325 and
 0.0748 for the paper SASRec. It stays well below the History baseline: 68 % of test

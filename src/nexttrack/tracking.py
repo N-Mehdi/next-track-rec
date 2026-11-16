@@ -8,7 +8,7 @@ to the Hugging Face repository tracking.hf_repo, tagged with the MLflow version,
 deployed service downloads at start.
 
   python -m nexttrack.tracking import-sasrec reports/sasrec_a_d128.json ...
-  python -m nexttrack.tracking log-reranker            log the last training (outputs/rerank)
+  python -m nexttrack.tracking log-reranker            log the last training (outputs/<rerank.name>)
   python -m nexttrack.tracking alias staging 3         point an alias to a version
   python -m nexttrack.tracking promote 3 [--no-publish]
   python -m nexttrack.tracking download production DIR
@@ -23,7 +23,8 @@ import mlflow
 from mlflow import MlflowClient
 
 from nexttrack import pipeline
-from nexttrack.config import parse_args
+from nexttrack.config import parse_args, production_config
+from nexttrack.rerank.features import uses_audio
 
 
 def connect(config):
@@ -63,8 +64,13 @@ def data_tags(paths):
 
 
 def model_settings(config, features):
-    """What the service needs next to the reranker: candidate quotas and feature order."""
-    return {"candidates": config["candidates"], "features": features, "split": config["split"]}
+    """What the service needs next to the reranker: candidate quotas, features, retrieval bundle."""
+    return {
+        "candidates": config["candidates"],
+        "rerank": {"audio_features": config["rerank"]["audio_features"]},
+        "features": features,
+        "retrieval": Path(config["candidates"]["sasrec_dir"]).name,
+    }
 
 
 def log_reranker(config, report, model_dir, client=None):
@@ -83,7 +89,8 @@ def log_reranker(config, report, model_dir, client=None):
     for name in ["recall@10", "recall@100", "ndcg@10"]:
         metrics["test_cold_strict_" + metric_name(name)] = report["test"]["cold_strict"]["metrics"][name]
     tags = data_tags([config["paths"]["prepared"], config["candidates"]["sasrec_dir"]])
-    tags["variant"] = "audio" if config["candidates"]["audio"] > 0 else "no_audio"
+    tags["variant"] = "audio" if uses_audio(config) else "no_audio"
+    tags["model_sha256"] = pipeline.file_sha256(Path(model_dir) / "reranker.onnx")
     with mlflow.start_run(experiment_id=experiment(client, "reranker"), tags=tags) as run:
         mlflow.log_params(params)
         mlflow.log_metrics(metrics)
@@ -96,9 +103,18 @@ def log_reranker(config, report, model_dir, client=None):
             mlflow.log_artifact(str(Path(folder) / "settings.json"), artifact_path="model")
         mlflow.log_artifact(str(Path(model_dir) / "reranker.onnx"), artifact_path="model")
         mlflow.log_artifact(str(Path(model_dir) / "reranker.txt"), artifact_path="model")
+    if config["rerank"]["name"] != production_config(config)["rerank"]["name"]:
+        # Offline variants are runs only: the registry holds deployable versions.
+        print("reranker run", run.info.run_id, "(not registered)")
+        return None
     name = config["tracking"]["model_name"]
     if not client.search_registered_models("name='%s'" % name):
         client.create_registered_model(name)
+    for existing in client.search_model_versions("name='%s'" % name):
+        if client.get_run(existing.run_id).data.tags.get("model_sha256") == tags["model_sha256"]:
+            # Same ONNX file as a registered version: no new version.
+            print("reranker run", run.info.run_id, "same model as version", existing.version)
+            return int(existing.version)
     version = client.create_model_version(name, "runs:/%s/model" % run.info.run_id, run_id=run.info.run_id)
     print("reranker run", run.info.run_id, "registered as", name, "version", version.version)
     return int(version.version)
@@ -146,31 +162,65 @@ def download(config, alias, destination, client=None):
     return Path(folder), int(version)
 
 
-def publish(config, folder, version):
-    """Upload the model files to the Hugging Face repository and tag them with the version."""
+CARD = """---
+license: apache-2.0
+tags:
+- recommender-systems
+- music
+---
+
+# {title}
+
+{description}
+
+Built from [yandex/yambda](https://huggingface.co/datasets/yandex/yambda) (Apache-2.0),
+size 50m, by [next-track-rec](https://github.com/N-Mehdi/next-track-rec). Tag `{tag}`.
+"""
+
+
+def publish(repo, folder, tag, message, private, description):
+    """Upload a folder with a short model card to a Hugging Face repository, tag the commit."""
     from huggingface_hub import HfApi
+
+    with open(Path(folder) / "README.md", "w", encoding="utf-8") as handle:
+        handle.write(CARD.format(title=repo.split("/")[-1], description=description, tag=tag))
 
     # The token comes from the environment (HF_TOKEN) and is never printed.
     api = HfApi(token=os.environ.get("HF_TOKEN"))
-    repo = config["tracking"]["hf_repo"]
-    api.create_repo(repo, private=config["tracking"]["hf_private"], exist_ok=True)
-    with open(Path(folder) / "version.json", "w", encoding="utf-8") as handle:
-        json.dump({"model": config["tracking"]["model_name"], "version": version}, handle)
-    commit = api.upload_folder(
-        repo_id=repo, folder_path=str(folder), commit_message="MLflow version %d" % version
-    )
-    api.create_tag(repo, tag="v%d" % version, revision=commit.oid, exist_ok=True)
-    print("published version", version, "to", repo, "tag v%d" % version)
+    api.create_repo(repo, private=private, exist_ok=True)
+    commit = api.upload_folder(repo_id=repo, folder_path=str(folder), commit_message=message)
+    api.create_tag(repo, tag=tag, revision=commit.oid, exist_ok=True)
+    print("published", repo, "tag", tag)
 
 
 def promote(config, version, publish_model=True, client=None):
     """Point production to the version, then publish its files for the deployed service."""
     client = client or connect(config)
+    name = config["tracking"]["model_name"]
+    run = client.get_run(client.get_model_version(name, str(version)).run_id)
+    if run.data.tags.get("variant") != "no_audio":
+        raise SystemExit("version %d is not the production variant (no audio)" % version)
     set_alias(config, "production", version, client)
-    if publish_model:
-        with tempfile.TemporaryDirectory() as destination:
-            folder, _ = download(config, "production", destination, client)
-            publish(config, folder, version)
+    if not publish_model:
+        return
+    with tempfile.TemporaryDirectory() as destination:
+        folder, _ = download(config, "production", destination, client)
+        with open(folder / "version.json", "w", encoding="utf-8") as handle:
+            json.dump({"model": name, "version": version}, handle)
+        tracking = config["tracking"]
+        description = (
+            "LightGBM reranker of next-track-rec in ONNX (version %d of the MLflow model %s), with the "
+            "candidate quotas and the feature order in settings.json." % (version, name)
+        )
+        tag = "v%d" % version
+        publish(
+            tracking["hf_repo"],
+            folder,
+            tag,
+            "MLflow version %d" % version,
+            tracking["hf_private"],
+            description,
+        )
 
 
 def add_arguments(parser):
@@ -185,9 +235,10 @@ def main():
         for path in args.values:
             import_sasrec(config, path)
     elif args.command == "log-reranker":
-        with open(Path(config["paths"]["reports"]) / "reranker.json", encoding="utf-8") as handle:
+        name = config["rerank"]["name"]
+        with open(Path(config["paths"]["reports"]) / (name + ".json"), encoding="utf-8") as handle:
             report = json.load(handle)
-        log_reranker(config, report, Path(config["paths"]["outputs"]) / "rerank")
+        log_reranker(config, report, Path(config["paths"]["outputs"]) / name)
     elif args.command == "alias":
         set_alias(config, args.values[0], int(args.values[1]))
     elif args.command == "promote":

@@ -233,3 +233,4 @@ __pycache__/
 !/tests/data/*.npz
 .vscode/
 /artifacts/
+/mlflow/

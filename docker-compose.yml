@@ -1,0 +1,19 @@
+# Local services of the MLOps phase. MLflow: experiments, registry and aliases.
+#   docker compose up -d mlflow      then http://localhost:5000
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.18.0
+    # Files in ./mlflow belong to the host user, not root.
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    environment:
+      HOME: /mlflow
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts
+      --serve-artifacts
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow:/mlflow
+    restart: unless-stopped

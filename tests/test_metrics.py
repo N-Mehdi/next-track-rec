@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from nexttrack.eval.metrics import evaluate
+from nexttrack.eval.metrics import evaluate, paired_bootstrap
 
 RANKED = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
 TARGETS = [np.array([2, 2, 9]), np.array([10])]
@@ -69,3 +69,16 @@ def test_no_cold_targets():
     result = evaluate(RANKED, TARGETS, [5], catalogue_size=10, seen_sets={"cold_train": np.arange(1, 11)})
     assert result["cold_train"]["users"] == 0
     assert "metrics" not in result["cold_train"]
+
+
+def test_paired_bootstrap_difference():
+    targets = [np.array([1]), np.array([2]), np.array([3]), np.array([4])]
+    better = np.array([[1, 0], [2, 0], [3, 0], [0, 4]])
+    worse = np.array([[0, 1], [0, 2], [0, 0], [0, 0]])
+    result = paired_bootstrap(better, worse, targets, [1, 2])
+    assert result["recall@1"]["diff"] == pytest.approx(0.75)
+    assert result["recall@2"]["diff"] == pytest.approx(0.5)
+    low, high = result["recall@1"]["ci95"]
+    assert 0 < low <= 0.75 <= high <= 1
+    same = paired_bootstrap(better, better, targets, [2])
+    assert same["ndcg@2"]["ci95"] == [0.0, 0.0]

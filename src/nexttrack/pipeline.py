@@ -24,7 +24,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from nexttrack import constants
-from nexttrack.config import parse_args
+from nexttrack.config import parse_args, production_config
 from nexttrack.tables import write_json
 
 SRC = Path(__file__).resolve().parent.parent
@@ -32,8 +32,9 @@ CACHE = Path(".cache/fingerprints.json")
 PACKAGES = ["numpy", "pyarrow", "pyspark", "torch", "faiss-cpu", "lightgbm", "onnxmltools", "onnxruntime"]
 
 
-def stage(name, module, io, sections, clean=False):
-    """clean: delete the output files before running (caches that are reused when present)."""
+def stage(name, module, io, sections, clean=False, production=False):
+    """clean: delete the output files before running (caches that are reused when present).
+    production: run with the overrides of the production section of the config."""
     if module is not None:
         module = "nexttrack." + module
     return {
@@ -43,6 +44,7 @@ def stage(name, module, io, sections, clean=False):
         "outputs": io[1],
         "sections": sections,
         "clean": clean,
+        "production": production,
     }
 
 
@@ -56,14 +58,21 @@ def stages(config):
         flat.append(raw / name)
     embeddings = raw / constants.EMBEDDINGS_FILE
     artists = raw / constants.ARTIST_FILE
+    groups = [artists, raw / constants.ALBUM_FILE]
     audio = [Path(paths["audio"]) / "item_ids.npy", Path(paths["audio"]) / "vectors.npy"]
     sasrec = Path(config["candidates"]["sasrec_dir"])
     knn = Path(paths["outputs"]) / "audio_knn"
-    rerank = Path(paths["outputs"]) / "rerank"
-    download = [], flat + [embeddings, raw / constants.ALBUM_FILE, artists]
+    offline = config["rerank"]["name"]
+    deployed = production_config(config)["rerank"]["name"]
+    download = [], flat + [embeddings] + groups
     knn_io = [embeddings, data], audio + [knn, reports / "audio_knn.json"]
-    rerank_io = [data, sasrec, knn, artists] + audio, [rerank, reports / "reranker.json"]
-    export_io = [data, sasrec, rerank, artists], [Path(paths["artifacts"])]
+    rerank_io = (
+        [data, sasrec, knn] + groups + audio,
+        [Path(paths["outputs"]) / offline, reports / (offline + ".json")],
+    )
+    deployed_io = [data, sasrec] + groups, [Path(paths["outputs"]) / deployed, reports / (deployed + ".json")]
+    export_io = [data, sasrec] + groups, [Path(paths["retrieval"])]
+    sections = ["split", "candidates", "rerank", "eval"]
     return [
         stage("download", "prep.download", download, ["data"]),
         stage("split", "prep.split", (flat + [embeddings], [data]), ["data", "spark", "split"]),
@@ -71,8 +80,10 @@ def stages(config):
         stage("audio_knn", "retrieval.audio_knn", knn_io, ["candidates", "eval"], clean=True),
         # Trained on Kaggle: only checked, never run here.
         stage("sasrec", None, ([data], [sasrec]), ["sasrec"]),
-        stage("reranker", "rerank.train_reranker", rerank_io, ["split", "candidates", "rerank", "eval"]),
-        stage("export", "serve.export", export_io, ["split", "candidates"]),
+        stage("reranker", "rerank.train_reranker", rerank_io, sections),
+        # The deployed variant, without audio; its versions go to the MLflow registry.
+        stage("reranker_production", "rerank.train_reranker", deployed_io, sections, production=True),
+        stage("export", "serve.export", export_io, ["split", "candidates", "production"]),
     ]
 
 
@@ -153,6 +164,8 @@ def code_sha256(module):
 
 def state(item, config, cache):
     """What a stage depends on: code, config sections and input fingerprints."""
+    if item["production"]:
+        config = production_config(config)
     sections = {}
     for name in item["sections"]:
         sections[name] = config.get(name)
@@ -190,8 +203,11 @@ def run_stage(item, args, current, entry):
         if item["clean"] and path.is_file():
             path.unlink()
     command = [sys.executable, "-m", item["module"], "--config", args.config]
-    if args.set:
-        command += ["--set"] + args.set
+    overrides = list(args.set)
+    if item["production"]:
+        overrides += args.production
+    if overrides:
+        command += ["--set"] + overrides
     subprocess.run(command, check=True)
 
 
@@ -224,6 +240,7 @@ def main():
     manifest_path = Path(config["paths"]["reports"]) / "manifest.json"
     manifest = read_json(manifest_path, {"stages": {}})
     cache = read_json(CACHE, {})
+    args.production = config["production"]["overrides"]
     for item in stages(config):
         entry = manifest["stages"].get(item["name"])
         current = state(item, config, cache)

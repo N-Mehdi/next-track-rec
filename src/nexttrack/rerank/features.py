@@ -3,6 +3,9 @@
 Candidates per user: SASRec, own history, audio kNN and DecayPop, deduplicated in that
 order and filled up to the total with the next SASRec items. Every feature only uses
 events before the cutoff of the day: TRAIN_END for validation, VAL_END for test.
+
+The production variant has no audio: candidates.audio = 0 and rerank.audio_features false
+remove the audio source and the two audio features, so the service needs no audio file.
 """
 
 from pathlib import Path
@@ -35,7 +38,23 @@ FEATURES = [
     "is_cold",
     "history_length",
 ]
+AUDIO_FEATURES = ["audio_score", "audio_last_score"]
+# Name of each candidate list, in the order of the union.
+SOURCES = ["sasrec", "history", "audio", "decay_pop", "sasrec"]
 RECENT_EVENTS = 200
+
+
+def feature_names(config):
+    """Features of the variant: all of them, or all but the audio ones."""
+    names = []
+    for name in FEATURES:
+        if config["rerank"]["audio_features"] or name not in AUDIO_FEATURES:
+            names.append(name)
+    return names
+
+
+def uses_audio(config):
+    return config["candidates"]["audio"] > 0 or config["rerank"]["audio_features"]
 
 
 def merge_sources(lists, total):
@@ -81,13 +100,30 @@ def net_state(prepared, positive, negative, cutoff):
     return np.sort(keys[last & (signs > 0)])
 
 
-def artist_map(raw_dir):
-    """Sorted item ids and their artist (first one when a track has several)."""
-    table = pq.read_table(str(Path(raw_dir) / constants.ARTIST_FILE))
+def candidate_sources(candidates, lists):
+    """Names of the candidate lists that hold each candidate."""
+    out = []
+    for item in candidates:
+        names = []
+        for j in range(len(lists)):
+            if SOURCES[j] not in names and item in lists[j]:
+                names.append(SOURCES[j])
+        out.append(names)
+    return out
+
+
+def item_groups(raw_dir, filename, column, known=None):
+    """Sorted item ids and their artist or album (the first one when there are several),
+    limited to the known items when given."""
+    table = pq.read_table(str(Path(raw_dir) / filename))
     items = table.column("item_id").to_numpy().astype(np.int64)
-    artists = table.column("artist_id").to_numpy().astype(np.int64)
+    groups = table.column(column).to_numpy().astype(np.int64)
     items, first = np.unique(items, return_index=True)
-    return items, artists[first]
+    groups = groups[first]
+    if known is None:
+        return items, groups
+    kept = np.isin(items, known)
+    return items[kept], groups[kept]
 
 
 def load_sasrec(model_path):
@@ -120,8 +156,11 @@ def sasrec_vectors(model_path, prepared, split, target_uids):
         return np.concatenate(parts), model.items.weight.numpy()
 
 
-def item_tables(config, prepared, all_items, all_times, cutoff):
-    """Item level arrays shared by all users of a day, also exported for the service."""
+def item_tables(config, prepared, all_items, all_times, cutoff, known_only=False):
+    """Item level arrays shared by all users of a day, also exported for the service.
+
+    known_only keeps the artist and album of training and history tracks only: enough for a
+    variant without audio source (smaller bundle), not for the audio kNN candidates."""
     pop_items, pop_scores = decayed_scores(all_items, all_times, config["candidates"]["decay_pop_hours"])
     count_items, counts = np.unique(all_items, return_counts=True)
     likes = read_table(prepared / "likes", ["item_id", "timestamp"])
@@ -129,7 +168,11 @@ def item_tables(config, prepared, all_items, all_times, cutoff):
     like_items, like_counts = np.unique(liked, return_counts=True)
     item_map = read_table(prepared / "item_map", ["item_id", "item_idx"])
     map_order = np.argsort(item_map.column("item_id").to_numpy())
-    artist_items, artists = artist_map(config["paths"]["raw"])
+    map_ids = item_map.column("item_id").to_numpy()[map_order]
+    known = np.union1d(count_items, map_ids) if known_only else None
+    raw = config["paths"]["raw"]
+    artist_items, artists = item_groups(raw, constants.ARTIST_FILE, "artist_id", known)
+    album_items, albums = item_groups(raw, constants.ALBUM_FILE, "album_id", known)
     return {
         "pop_items": pop_items,
         "pop_scores": pop_scores,
@@ -140,7 +183,9 @@ def item_tables(config, prepared, all_items, all_times, cutoff):
         "like_counts": like_counts,
         "artist_items": artist_items,
         "artists": artists,
-        "map_ids": item_map.column("item_id").to_numpy()[map_order],
+        "album_items": album_items,
+        "albums": albums,
+        "map_ids": map_ids,
         "map_idxs": item_map.column("item_idx").to_numpy()[map_order],
     }
 
@@ -160,7 +205,6 @@ def load_day(config, split):
     times = list_column(history, "timestamps")
     day = item_tables(config, prepared, np.concatenate(items), np.concatenate(times), cutoff)
     sasrec_dir = Path(config["candidates"]["sasrec_dir"])
-    audio_ids, audio_vectors = load_audio(paths["raw"], paths["audio"])
     day["cutoff"] = cutoff
     day["uids"] = target_uids
     day["histories"] = align(history_uids, items, target_uids)
@@ -168,18 +212,20 @@ def load_day(config, split):
     day["targets"] = list_column(targets, "item_ids")
     day["liked"] = net_state(prepared, "likes", "unlikes", cutoff)
     day["disliked"] = net_state(prepared, "dislikes", "undislikes", cutoff)
-    day["audio_ids"] = audio_ids
-    day["audio_vectors"] = audio_vectors
     sasrec_uids, sasrec_items = read_ranked(sasrec_dir / ("candidates_%s.parquet" % split))
     day["sasrec"] = align(sasrec_uids, sasrec_items, target_uids)
-    audio_dir = Path(config["candidates"]["audio_dir"])
-    audio_uids, audio_items = read_ranked(audio_dir / ("candidates_%s.parquet" % split))
-    day["audio_lists"] = align(audio_uids, audio_items, target_uids)
     vectors = sasrec_vectors(sasrec_dir / "model.pt", prepared, split, target_uids)
     day["user_vectors"], day["item_vectors"] = vectors
-    num_items = config["candidates"]["audio_history_items"]
-    day["audio_query"] = user_queries(day["histories"], audio_ids, audio_vectors, num_items)
-    day["audio_last"] = user_queries(day["histories"], audio_ids, audio_vectors, 1)
+    if uses_audio(config):
+        audio_ids, audio_vectors = load_audio(paths["raw"], paths["audio"])
+        day["audio_ids"] = audio_ids
+        day["audio_vectors"] = audio_vectors
+        audio_dir = Path(config["candidates"]["audio_dir"])
+        audio_uids, audio_items = read_ranked(audio_dir / ("candidates_%s.parquet" % split))
+        day["audio_lists"] = align(audio_uids, audio_items, target_uids)
+        num_items = config["candidates"]["audio_history_items"]
+        day["audio_query"] = user_queries(day["histories"], audio_ids, audio_vectors, num_items)
+        day["audio_last"] = user_queries(day["histories"], audio_ids, audio_vectors, 1)
     return day
 
 
@@ -234,7 +280,7 @@ def cosine(vectors, rows, query):
 
 
 def user_rows(day, i, config):
-    """Candidates and feature matrix of the i-th target user."""
+    """Candidates, feature matrix and candidate lists (see SOURCES) of the i-th target user."""
     quotas = config["candidates"]
     items = day["histories"][i]
     times = day["history_times"][i]
@@ -243,13 +289,10 @@ def user_rows(day, i, config):
     if len(items) > 0:
         unique, scores = decayed_scores(items, times, quotas["history_hours"])
         history_top = top_items(unique, scores, quotas["history"])
-    lists = [
-        sasrec[: quotas["sasrec"]],
-        history_top,
-        day["audio_lists"][i][: quotas["audio"]],
-        day["pop_top"],
-        sasrec[quotas["sasrec"] :],
-    ]
+    audio = np.zeros(0, dtype=np.int64)
+    if quotas["audio"] > 0:
+        audio = day["audio_lists"][i][: quotas["audio"]]
+    lists = [sasrec[: quotas["sasrec"]], history_top, audio, day["pop_top"], sasrec[quotas["sasrec"] :]]
     candidates = merge_sources(lists, quotas["total"]).astype(np.int64)
 
     columns = {}
@@ -257,9 +300,10 @@ def user_rows(day, i, config):
     warm = idx > 0
     columns["sasrec_score"] = np.where(warm, day["item_vectors"][idx] @ day["user_vectors"][i], np.nan)
     columns.update(history_features(items, times, day["cutoff"], candidates, quotas["history_hours"]))
-    audio_rows = find(day["audio_ids"], candidates)
-    columns["audio_score"] = cosine(day["audio_vectors"], audio_rows, day["audio_query"][i])
-    columns["audio_last_score"] = cosine(day["audio_vectors"], audio_rows, day["audio_last"][i])
+    if config["rerank"]["audio_features"]:
+        audio_rows = find(day["audio_ids"], candidates)
+        columns["audio_score"] = cosine(day["audio_vectors"], audio_rows, day["audio_query"][i])
+        columns["audio_last_score"] = cosine(day["audio_vectors"], audio_rows, day["audio_last"][i])
     columns["pop_score"] = lookup_values(day["pop_items"], day["pop_scores"], candidates, 0.0)
     columns["item_count"] = lookup_values(day["count_items"], day["counts"], candidates, 0)
     columns["item_like_count"] = lookup_values(day["like_items"], day["like_counts"], candidates, 0)
@@ -274,12 +318,13 @@ def user_rows(day, i, config):
     columns["user_artist_share"] = columns["user_artist_count"] / max(len(items), 1)
     columns["is_cold"] = ~warm
     columns["history_length"] = np.full(len(candidates), len(items))
-    matrix = np.zeros((len(candidates), len(FEATURES)), dtype=np.float32)
-    for j in range(len(FEATURES)):
+    names = feature_names(config)
+    matrix = np.zeros((len(candidates), len(names)), dtype=np.float32)
+    for j in range(len(names)):
         # Three decimals: below 8192 two distinct values are never adjacent float32 numbers,
         # so the float32 thresholds of the ONNX trees split exactly like LightGBM.
-        matrix[:, j] = np.round(columns[FEATURES[j]].astype(np.float64), 3)
-    return candidates, matrix
+        matrix[:, j] = np.round(columns[names[j]].astype(np.float64), 3)
+    return candidates, matrix, lists
 
 
 def build_day(config, split):
@@ -290,19 +335,20 @@ def build_day(config, split):
     labels = []
     sizes = np.zeros(len(day["uids"]), dtype=np.int64)
     for i in range(len(day["uids"])):
-        candidates, matrix = user_rows(day, i, config)
+        candidates, matrix, _ = user_rows(day, i, config)
         all_items.append(candidates)
         matrices.append(matrix)
         labels.append(np.isin(candidates, day["targets"][i]).astype(np.float32))
         sizes[i] = len(candidates)
     return {
         "uids": day["uids"],
+        "names": feature_names(config),
         "targets": day["targets"],
         "sizes": sizes,
         "items": np.concatenate(all_items),
         "features": np.concatenate(matrices),
         "labels": np.concatenate(labels),
-        "audio_lists": day["audio_lists"],
+        "audio_lists": day.get("audio_lists"),
         "histories": day["histories"],
         "history_times": day["history_times"],
     }

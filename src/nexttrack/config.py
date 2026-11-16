@@ -38,6 +38,15 @@ def copy_config(config):
     return copy.deepcopy(config)
 
 
+def production_config(config):
+    """The deployed variant: the config with the overrides of its production section."""
+    out = copy_config(config)
+    for item in config["production"]["overrides"]:
+        key, raw_value = item.split("=", 1)
+        set_dotted(out, key, parse_value(raw_value))
+    return out
+
+
 def parse_args(description, add_arguments=None):
     """Common command line: --config path and --set section.key=value overrides."""
     parser = argparse.ArgumentParser(description=description)

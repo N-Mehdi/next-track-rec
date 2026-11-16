@@ -5,8 +5,8 @@ paths:
   prepared: data/prepared
   # Float32 copy of the audio embeddings, built on first use.
   audio: data/audio
-  # Service files written by nexttrack.serve.export.
-  artifacts: artifacts
+  # Retrieval bundle of the service, written by nexttrack.serve.export.
+  retrieval: artifacts/retrieval
   checkpoints: checkpoints
   outputs: outputs
   reports: reports
@@ -78,9 +78,18 @@ rerank:
   num_threads: 0
   # Post-processing variant: one position in every audio_every kept for the audio kNN.
   audio_every: 10
+  # Audio similarity features (audio_score, audio_last_score).
+  audio_features: true
+  # Outputs go to paths.outputs/<name>, the report to paths.reports/<name>.json.
+  name: reranker
 
 eval:
   k_values: [10, 50, 100]
+
+production:
+  # The deployed variant has no audio file: no audio source, no audio feature. Trained by
+  # the pipeline stage reranker_production; only its versions are registered in MLflow.
+  overrides: ["candidates.audio=0", "rerank.audio_features=false", "rerank.name=reranker_production"]
 
 tracking:
   # Every reranker training is logged to the local MLflow of docker-compose.yml.
@@ -89,4 +98,6 @@ tracking:
   model_name: nexttrack-reranker
   # Promotion to production publishes the model there for the deployed service.
   hf_repo: N-Mehdi/nexttrack-reranker
-  hf_private: true
+  # Retrieval bundle of the service (SASRec encoder, item vectors, item tables).
+  retrieval_repo: N-Mehdi/nexttrack-retrieval
+  hf_private: false

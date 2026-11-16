@@ -19,7 +19,7 @@ from nexttrack import constants
 from nexttrack.config import parse_args
 from nexttrack.eval.baselines import history_ranking
 from nexttrack.eval.metrics import cold_targets, evaluate, paired_bootstrap
-from nexttrack.rerank.features import FEATURES, build_day
+from nexttrack.rerank.features import build_day
 from nexttrack.tables import read_item_ids, seen_item_sets, to_builtin, write_json, write_ranked
 
 
@@ -68,7 +68,7 @@ def user_folds(data, num_folds, seed):
 
 def dataset(data, users, reference=None):
     features, labels, groups = subset(data, users)
-    return lgb.Dataset(features, labels, group=groups, feature_name=FEATURES, reference=reference)
+    return lgb.Dataset(features, labels, group=groups, feature_name=data["names"], reference=reference)
 
 
 def train(data, cfg):
@@ -112,7 +112,8 @@ def train(data, cfg):
 def export_onnx(model_file, features, path):
     """ONNX copy of the saved booster; returns ONNX and LightGBM scores on the given rows."""
     booster = lgb.Booster(model_file=str(model_file))
-    model = convert_lightgbm(booster, initial_types=[("features", FloatTensorType([None, len(FEATURES)]))])
+    inputs = [("features", FloatTensorType([None, features.shape[1]]))]
+    model = convert_lightgbm(booster, initial_types=inputs)
     # The converter names the graph with a random id: a fixed name makes the file reproducible.
     model.graph.name = "nexttrack_reranker"
     with open(path, "wb") as handle:
@@ -151,15 +152,16 @@ def reserve_audio(ranked, audio_lists, every, width):
 
 
 def paired_comparisons(ranked, history, reserved, targets, k_values, strict_items):
-    """Paired bootstrap differences on all users, and on the cold_strict targets for the variant."""
-    users, subset, _ = cold_targets(targets, strict_items)
-    return {
-        "reranker_minus_history": paired_bootstrap(ranked, history, targets, k_values),
-        "reserved_minus_reranker": paired_bootstrap(reserved, ranked, targets, k_values),
-        "reserved_minus_reranker_cold_strict": paired_bootstrap(
+    """Paired bootstrap differences on all users, and on the cold_strict targets for the audio
+    variant; reserved is None without audio source."""
+    out = {"reranker_minus_history": paired_bootstrap(ranked, history, targets, k_values)}
+    if reserved is not None:
+        users, subset, _ = cold_targets(targets, strict_items)
+        out["reserved_minus_reranker"] = paired_bootstrap(reserved, ranked, targets, k_values)
+        out["reserved_minus_reranker_cold_strict"] = paired_bootstrap(
             reserved[users], ranked[users], subset, k_values
-        ),
-    }
+        )
+    return out
 
 
 def main():
@@ -167,7 +169,7 @@ def main():
     cfg = config["rerank"]
     k_values = config["eval"]["k_values"]
     prepared = Path(config["paths"]["prepared"])
-    out_dir = Path(config["paths"]["outputs"]) / "rerank"
+    out_dir = Path(config["paths"]["outputs"]) / cfg["name"]
     catalogue_size = len(read_item_ids(prepared / "item_map"))
     seen = seen_item_sets(prepared)
     width = config["candidates"]["total"]
@@ -201,26 +203,26 @@ def main():
     onnx_ranked, _ = ranked_matrix(test, onnx_scores, constants.NUM_RANKED)
     onnx_ndcg = evaluate(onnx_ranked, test["targets"], [10], catalogue_size)["all"]["ndcg@10"]
 
-    reserved = reserve_audio(ranked, test["audio_lists"], cfg["audio_every"], constants.NUM_RANKED)
-    reserved_metrics = evaluate(reserved, test["targets"], k_values, catalogue_size, seen)
+    reserved = None
+    if config["candidates"]["audio"] > 0:
+        reserved = reserve_audio(ranked, test["audio_lists"], cfg["audio_every"], constants.NUM_RANKED)
     hours = config["candidates"]["history_hours"]
     history = history_ranking(test["histories"], test["history_times"], hours, constants.NUM_RANKED)
     paired = paired_comparisons(ranked, history, reserved, test["targets"], k_values, seen["cold_strict"])
 
     importance = {}
     gains = booster.feature_importance("gain")
-    for j in range(len(FEATURES)):
-        importance[FEATURES[j]] = float(gains[j])
+    for j in range(len(test["names"])):
+        importance[test["names"][j]] = float(gains[j])
     report = {
         "config": {"candidates": config["candidates"], "rerank": cfg},
-        "features": FEATURES,
+        "features": test["names"],
         "feature_seconds": feature_seconds,
         "train_seconds": train_seconds,
         "training": training,
         "label_share_val": float(val["labels"].mean()),
         "candidate_union": union,
         "test": test_metrics,
-        "test_reserved_audio": reserved_metrics,
         "paired": paired,
         "importance_gain": importance,
         "onnx_max_abs_gap": float(onnx_gap.max()),
@@ -228,8 +230,10 @@ def main():
         "saved_model_max_abs_gap": float(np.abs(saved_scores - scores).max()),
         "onnx_test_ndcg@10": onnx_ndcg,
     }
+    if reserved is not None:
+        report["test_reserved_audio"] = evaluate(reserved, test["targets"], k_values, catalogue_size, seen)
     report = to_builtin(report)
-    write_json(report, Path(config["paths"]["reports"]) / "reranker.json")
+    write_json(report, Path(config["paths"]["reports"]) / (cfg["name"] + ".json"))
     if config["tracking"]["enabled"]:
         from nexttrack.tracking import log_reranker
 

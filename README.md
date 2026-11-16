@@ -26,6 +26,7 @@ with its 95 % bootstrap interval.
 | Audio kNN (never-seen tracks only) | 0.0003 | 0.0005 | 0.0004 | 0.0004 | 0.0024 | 0.0002 | 0.0005 | (1) | 0.0080 [0.0028, 0.0145] |
 | **Reranker** | **0.2363** | **0.2453** | **0.2872** | **0.2386** | **0.5888** | **0.1199** | **0.2540** | 0.1608 | 0.0013 [0.0000, 0.0040] |
 | Reranker, audio every 10th position | 0.2212 | 0.2362 | 0.2810 | 0.2337 | 0.5740 | 0.1137 | 0.2441 | 0.2121 | 0.0024 [0.0000, 0.0059] |
+| Reranker without audio (deployed) | 0.2372 | 0.2454 | 0.2917 | 0.2410 | 0.5882 | 0.1208 | 0.2540 | 0.1607 | 0 |
 | SASRec (paper) | | | | | | 0.0325 | 0.0748 | 0.0310 | |
 | ItemKNN (paper) | | | | | | 0.0373 | 0.0781 | 0.0874 | |
 
@@ -37,8 +38,9 @@ cover 3.8 % of that pool.
 - Never-seen tracks: the audio kNN alone is the best model on `cold_strict`; the reranker
   keeps few of its candidates. Reserving one position in ten for them recovers part of it
   at a cost of 0.0092 in `ndcg@10` (details in [Reranker](#reranker-local-cpu)).
-- The CPU service returns the same top 10 as the offline evaluation for 296 of 300 sampled
-  test users, in about 0.5 s per request.
+- The deployed reranker has no audio source and no audio feature: same `ndcg@10` (0.2454),
+  no never-seen track. It runs in a CPU service of about 1 GB that returns the same top 10
+  as the offline evaluation for 297 of 300 sampled test users, in 62 ms (p50).
 
 ## Data
 
@@ -281,8 +283,9 @@ python -m nexttrack.pipeline --force reranker     # run a stage again
 | baselines | `eval.baselines` | `reports/baselines.json` |
 | audio_knn | `retrieval.audio_knn` | `data/audio` (float32 cache), `outputs/audio_knn`, `reports/audio_knn.json` |
 | sasrec | trained on Kaggle, only checked | `outputs/a_d128_e60` |
-| reranker | `rerank.train_reranker` | `outputs/rerank`, `reports/reranker.json` |
-| export | `serve.export` | `artifacts/` |
+| reranker | `rerank.train_reranker` | `outputs/reranker`, `reports/reranker.json` |
+| reranker_production | `rerank.train_reranker`, production overrides | `outputs/reranker_production`, `reports/reranker_production.json` |
+| export | `serve.export` | `artifacts/retrieval` |
 
 A stage runs when its inputs, its code or its config sections differ from
 `reports/manifest.json`, or when one of its outputs is missing or changed. The code of a
@@ -372,7 +375,7 @@ python -m nexttrack.train.train_sasrec --set paths.outputs=data/smoke_outputs \
 ### Reranker (local, CPU)
 
 ```bash
-python -m nexttrack.rerank.train_reranker         # writes reports/reranker.json and outputs/rerank
+python -m nexttrack.rerank.train_reranker         # writes reports/reranker.json and outputs/reranker
 ```
 
 Candidates, 200 per user, deduplicated in this order: SASRec top 100, History top 50, audio
@@ -421,13 +424,23 @@ Most used features (gain): count in the last 200 events, history score, events s
 last listen, artist listens, SASRec score. Features take 71 s for both days, the 6
 trainings (5 folds and the final model) 2 minutes on 12 cores.
 
-ONNX export: `outputs/rerank/reranker.onnx`, converted with onnxmltools. Its tree
+ONNX export: `outputs/reranker/reranker.onnx`, converted with onnxmltools. Its tree
 thresholds are float32 while LightGBM compares in float64, so a value lying between a
 threshold and its float32 rounding takes the other branch. Features are rounded to three
 decimals, which keeps two distinct values from being adjacent float32 numbers, but
 LightGBM can still place a threshold within float32 precision of a frequent value: 20 of
 919,800 test rows differ by more than 1e-4, and the test `ndcg@10` computed from the ONNX
 scores is equal to the LightGBM one to the fourth decimal (0.2453).
+
+Deployed variant without audio. The service does not hold the 4 GB of audio vectors: the
+variant deployed has no audio source and no audio feature (`production.overrides` in
+the config, pipeline stage `reranker_production`, report `reports/reranker_production.json`).
+Its 200 candidates come from SASRec, the history and DecayPop, its 15 features are the
+others. Results on the test day: `ndcg@10` 0.2454 (0.2453 with audio), `recall@10` 0.2372,
+paired difference with History `ndcg@10` +0.0346 [0.0304, 0.0388]; 94 rounds. It reaches no
+`cold_strict` target, and `cold_train` targets only through the history (`recall@100`
+0.0266 [0.0163, 0.0383]). ONNX: 132 of 919,800 rows differ by more than 1e-4, same
+`ndcg@10` to the fourth decimal.
 
 ## Experiment tracking and model registry (MLflow, local)
 
@@ -447,12 +460,17 @@ of truth for experiments, registered versions and aliases.
 - `reranker` experiment: every training of `rerank.train_reranker` is logged
   (`tracking.enabled`): configuration, test metrics with the never-seen subset, number of
   rounds, ONNX parity, fingerprints of the prepared data and of the SASRec outputs, and
-  the files the service needs (`reranker.onnx`, `reranker.txt`, `settings.json`). Each
-  run registers a new version of `nexttrack-reranker`.
-- Aliases `staging` and `production`. `promote` moves `production`, then publishes the
-  files of that version to the Hugging Face repository `tracking.hf_repo`, tagged
-  `v<version>`, with the token of the `HF_TOKEN` environment variable. The deployed
-  service downloads the model from there at start.
+  the files the service needs (`reranker.onnx`, `reranker.txt`, `settings.json` with the
+  candidate quotas, the feature order and the retrieval bundle it was built on). Runs of
+  the deployed variant (no audio) register a new version of `nexttrack-reranker`; other
+  variants stay runs.
+- Aliases `staging` and `production`. `promote` refuses a version that is not the deployed
+  variant, moves `production`, then publishes the files of that version with a
+  `version.json` to the public Hugging Face repository `tracking.hf_repo`, tagged
+  `v<version>`, with the token of the `HF_TOKEN` environment variable.
+- The retrieval bundle (`python -m nexttrack.serve.export --publish`) goes to
+  `tracking.retrieval_repo`, tagged with the SASRec run name. It changes only after a new
+  SASRec run.
 
 ## Continuous integration
 
@@ -463,10 +481,10 @@ test suite (Java 21 for the Spark test) and a reranker non-regression check.
 python -m nexttrack.eval.regression            # exit code 1 on regression
 ```
 
-The check trains the reranker with the current code on 400 users of a frozen sample of
-the validation day (`tests/data/regression_day.npz`, 600 users, never the test day) and
-scores the other 200. It fails when `ndcg@10` is more than 0.005 below the stored
-reference (0.2244) or when the ONNX copy gives a different `ndcg@10`. It runs on one
+The check trains the deployed variant of the reranker with the current code on 400 users
+of a frozen sample of the validation day (`tests/data/regression_day.npz`, 600 users,
+never the test day) and scores the other 200. It fails when `ndcg@10` is more than 0.005
+below the stored reference (0.2300) or when the ONNX copy gives a different `ndcg@10`. It runs on one
 thread, so the value is the same on every machine. `--freeze` rebuilds the sample from
 `data/prepared` and `--update` stores a new reference; both are deliberate, reviewed
 changes.
@@ -474,41 +492,54 @@ changes.
 ## Service (CPU, Docker)
 
 ```bash
-python -m nexttrack.serve.export                  # writes artifacts/ (790 MB), needs the train extra
-docker build -t next-track-rec .
-docker run -p 8000:8000 -v "$PWD/artifacts:/artifacts:ro" -v "$PWD/data/audio:/audio:ro" next-track-rec
+python -m nexttrack.serve.export                  # artifacts/retrieval (700 MB), needs the train extra
+docker build --build-arg COMMIT=$(git rev-parse --short HEAD) -t next-track-rec .
+docker run -p 8000:8000 -e NEXTTRACK_RERANKER_REVISION=v3 -e NEXTTRACK_RETRIEVAL_REVISION=a_d128_e60 next-track-rec
 ```
 
-`artifacts/` holds the SASRec encoder (`sasrec_encoder.onnx`, last 200 events to a user
-vector), the item embeddings for the exact FAISS search, the reranker
-(`reranker.onnx`), item tables frozen at `VAL_END` (popularity, listen and like counts,
-artist of each track) and `settings.json` (candidate quotas). The float32 audio embeddings
-(`data/audio`, 4 GB, written by the audio kNN step) are mounted separately. The image
-(764 MB) holds no torch and no model file.
+At start the service reads two folders, local paths or Hugging Face repositories downloaded
+at a revision:
+
+| Variable | Default in the image | Content |
+|---|---|---|
+| `NEXTTRACK_RERANKER`, `_REVISION` | `N-Mehdi/nexttrack-reranker` | `reranker.onnx`, `settings.json`, `version.json` |
+| `NEXTTRACK_RETRIEVAL`, `_REVISION` | `N-Mehdi/nexttrack-retrieval` | SASRec encoder in ONNX, item vectors, item tables, `retrieval.json` |
+
+The item tables are frozen at `VAL_END`: popularity, Listen+ and like counts, artist and
+album of every training or history track. The service refuses a reranker built on another
+retrieval bundle. The image (776 MB) holds no torch and no model file; `NEXTTRACK_COMMIT`
+is the git commit it was built from.
 
 ```bash
-curl -s localhost:8000/health
+curl -s localhost:8000/health        # {"status", "model_version", "retrieval", "commit"}
+curl -s localhost:8000/metrics/      # Prometheus
 curl -s -X POST localhost:8000/recommend -H 'Content-Type: application/json' -d '{
   "history": [{"item_id": 6566295, "timestamp": 25900000}, {"item_id": 2562990, "timestamp": 25900200}],
   "liked": [2562990],
-  "disliked": [],
   "k": 10
 }'
 ```
 
 - `history`: Listen+ events (`played_ratio_pct >= 50`) as item id and timestamp, in any
-  order. Tracks unknown to SASRec are kept for the history, audio and artist features.
-- `liked`, `disliked`: the user's current likes and dislikes (optional).
-- `k`: 1 to 100. `now` (optional): the request time, by default the last event.
-- Response: `{"tracks": [{"item_id": ..., "score": ...}, ...]}`, best first.
+  order. `liked`, `disliked`: current likes and dislikes (optional). `k`: 1 to 100. `now`
+  (optional): the request time, by default the last event.
+- Response: `model_version` and the tracks, best first. Yambda has no track, artist or
+  album names, so each track is described by its identifiers: `label` ("track 3193233,
+  artist 403970, album 76493"), `artist_id`, `album_id`, `listens` (Listen+ events of all
+  users before the cutoff), `user_listens`, `already_listened`, `artist_already_listened`
+  and `sources`, the candidate lists that proposed it (`sasrec`, `history`, `decay_pop`).
+- Metrics: `nexttrack_requests_total` by HTTP status, `nexttrack_request_seconds`
+  (histogram, p50 and p95 with `histogram_quantile`), `nexttrack_model_info` (version and
+  retrieval bundle).
 
-The service builds the 200 candidates and the 17 features with the same functions as the
+The service builds the candidates and the features with the same functions as the
 offline evaluation (`rerank.features.user_rows`). On 300 random test users it returns the
-same top 10 as the offline ranking for 296 of them; `ndcg@10` on these users is 0.2714
-against 0.2713 offline. The remaining differences come from the SASRec candidates, computed
-in fp16 on the GPU offline and in fp32 in the service. One request takes about 0.5 s
-(p50 0.49 s, p95 0.59 s on 12 cores), most of it in the exact search over 7.1 M audio
-vectors. The container starts in a few seconds and uses about 4.7 GB of memory.
+same top 10 as the offline ranking of the deployed variant for 297 of them; `ndcg@10` on
+these users is 0.2713 against 0.2711 offline. The remaining differences come from the
+SASRec candidates, computed in fp16 on the GPU offline and in fp32 in the service. One
+request takes 62 ms (p50) and 85 ms (p95) on 12 cores; the container loads in under a
+second and uses about 1.0 GB. The audio variant (`settings.json` with audio, audio vectors
+in `NEXTTRACK_AUDIO`) still runs, at about 0.5 s per request and 4.7 GB.
 
 ## Models
 
@@ -516,7 +547,8 @@ vectors. The container starts in a few seconds and uses about 4.7 GB of memory.
 |---|---|---|---|
 | SASRec A | last 200 Listen+ tracks seen in training | user vector (128) | Listen+ events before `TRAIN_END` |
 | Audio kNN | last 5 tracks with an audio embedding | 30 tracks absent from training | no training |
-| Reranker | 17 features per candidate | score | validation day, 3,978 users |
+| Reranker (offline, with audio) | 17 features per candidate | score | validation day, 3,978 users |
+| Reranker (deployed, no audio) | 15 features per candidate | score | validation day, 4,037 users |
 
 Intended use: ranking the next tracks of a listener of the Yambda-50M population, for
 research and demonstration. Limits:
@@ -524,7 +556,8 @@ research and demonstration. Limits:
 - The models know the 627,648 tracks listened before `TRAIN_END` and the 10,000 Yambda-50M
   users' behaviour only; item tables are frozen at `VAL_END`.
 - Never-seen tracks are reached through audio similarity only, and the reranker rarely
-  keeps them (see the table above).
+  keeps them (see the table above). The deployed variant has no audio: it never recommends
+  a track absent from the training data and from the user's history.
 - 68 % of test targets are repeats: the reranker relies mostly on the user's own history
   (main features: listens of the track in the last 200 events, recency-weighted history
   score, events since the last listen). On average 4.7 % of its top 10 are tracks absent

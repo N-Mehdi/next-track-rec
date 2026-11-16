@@ -1,11 +1,14 @@
-# CPU inference image. Artifacts and audio embeddings are mounted at run time:
-#   docker run -p 8000:8000 -v "$PWD/artifacts:/artifacts:ro" -v "$PWD/data/audio:/audio:ro" next-track-rec
+# CPU inference image. The reranker and the retrieval bundle are downloaded from Hugging Face
+# at start, at the revisions given by the environment (set by the Kubernetes manifest):
+#   docker run -p 8000:8000 -e NEXTTRACK_RERANKER_REVISION=v3 -e NEXTTRACK_RETRIEVAL_REVISION=a_d128_e60 next-track-rec
 FROM python:3.12-slim
 
+ARG COMMIT=unknown
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    NEXTTRACK_ARTIFACTS=/artifacts \
-    NEXTTRACK_AUDIO=/audio
+    NEXTTRACK_COMMIT=${COMMIT} \
+    NEXTTRACK_RERANKER=N-Mehdi/nexttrack-reranker \
+    NEXTTRACK_RETRIEVAL=N-Mehdi/nexttrack-retrieval
 
 WORKDIR /app
 COPY pyproject.toml README.md LICENSE ./

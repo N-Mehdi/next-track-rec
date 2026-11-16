@@ -393,6 +393,23 @@ LightGBM can still place a threshold within float32 precision of a frequent valu
 919,800 test rows differ by more than 1e-4, and the test `ndcg@10` computed from the ONNX
 scores is equal to the LightGBM one to the fourth decimal (0.2453).
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and on pull requests: ruff, the
+test suite (Java 21 for the Spark test) and a reranker non-regression check.
+
+```bash
+python -m nexttrack.eval.regression            # exit code 1 on regression
+```
+
+The check trains the reranker with the current code on 400 users of a frozen sample of
+the validation day (`tests/data/regression_day.npz`, 600 users, never the test day) and
+scores the other 200. It fails when `ndcg@10` is more than 0.005 below the stored
+reference (0.2244) or when the ONNX copy gives a different `ndcg@10`. It runs on one
+thread, so the value is the same on every machine. `--freeze` rebuilds the sample from
+`data/prepared` and `--update` stores a new reference; both are deliberate, reviewed
+changes.
+
 ## Service (CPU, Docker)
 
 ```bash

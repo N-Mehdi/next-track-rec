@@ -65,6 +65,7 @@ def test_stage_reruns_when_input_or_output_changes(tmp_path):
         "inputs": [source],
         "outputs": [result],
         "sections": ["eval"],
+        "production": False,
     }
     config = {"eval": {"k_values": [10]}}
     cache = {}
@@ -87,4 +88,25 @@ def test_stage_list_follows_the_config():
     names = []
     for item in pipeline.stages(load_config("configs/default.yaml")):
         names.append(item["name"])
-    assert names == ["download", "split", "baselines", "audio_knn", "sasrec", "reranker", "export"]
+    expected = ["download", "split", "baselines", "audio_knn", "sasrec", "reranker", "reranker_production"]
+    assert names == expected + ["export"]
+
+
+def test_production_stage_uses_the_production_overrides(tmp_path):
+    from nexttrack.config import load_config
+
+    # Paths in an empty folder: the test does not hash the real data.
+    overrides = []
+    for name in ["raw", "prepared", "audio", "outputs", "reports", "retrieval"]:
+        overrides.append("paths.%s=%s" % (name, tmp_path / name))
+    overrides.append("candidates.sasrec_dir=%s" % (tmp_path / "sasrec"))
+    config = load_config("configs/default.yaml", overrides)
+    by_name = {}
+    for item in pipeline.stages(config):
+        by_name[item["name"]] = item
+    offline = pipeline.state(by_name["reranker"], config, {})
+    deployed = pipeline.state(by_name["reranker_production"], config, {})
+    # Same code, other configuration: the two variants are tracked separately.
+    assert offline["code"] == deployed["code"]
+    assert offline["config"] != deployed["config"]
+    assert str(by_name["reranker_production"]["outputs"][0]).endswith("reranker_production")

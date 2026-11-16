@@ -22,8 +22,15 @@ def config(tmp_path, monkeypatch):
         },
         "paths": {"prepared": str(tmp_path / "prepared")},
         "candidates": {"sasrec": 100, "audio": 0, "sasrec_dir": str(tmp_path / "sasrec")},
-        "rerank": {"num_leaves": 63, "learning_rate": 0.05},
+        "rerank": {"num_leaves": 63, "audio_features": False, "name": "reranker_production"},
         "split": {"shift_days": 0},
+        "production": {
+            "overrides": [
+                "candidates.audio=0",
+                "rerank.audio_features=false",
+                "rerank.name=reranker_production",
+            ]
+        },
     }
 
 
@@ -50,12 +57,18 @@ def test_versions_aliases_and_download(config, tmp_path):
     first = tracking.log_reranker(config, REPORT, model_dir(tmp_path, "one"))
     second = tracking.log_reranker(config, REPORT, model_dir(tmp_path, "two"))
     assert (first, second) == (1, 2)
+    # Training again to the same ONNX file gives no new version.
+    (tmp_path / "again").mkdir()
+    (tmp_path / "again" / "reranker.onnx").write_text("two")
+    (tmp_path / "again" / "reranker.txt").write_text("two")
+    assert tracking.log_reranker(config, REPORT, tmp_path / "again") == 2
     tracking.set_alias(config, "staging", second)
     folder, version = tracking.download(config, "staging", tmp_path / "out")
     assert version == 2
     assert (folder / "reranker.onnx").read_text() == "two"
     settings = json.loads((folder / "settings.json").read_text())
     assert settings["features"] == ["a", "b"]
+    assert settings["retrieval"] == "sasrec"
     run = tracking.connect(config).search_runs([tracking.experiment(tracking.connect(config), "reranker")])[0]
     assert run.data.metrics["test_ndcg_at_10"] == pytest.approx(0.25)
     assert run.data.tags["variant"] == "no_audio"
@@ -65,12 +78,13 @@ def test_promote_publishes_the_production_version(config, tmp_path, monkeypatch)
     tracking.log_reranker(config, REPORT, model_dir(tmp_path, "one"))
     published = []
 
-    def fake_publish(config, folder, version):
-        published.append((version, (folder / "reranker.onnx").read_text()))
+    def fake_publish(repo, folder, tag, message, private, description):
+        version = json.loads((folder / "version.json").read_text())["version"]
+        published.append((repo, tag, version, (folder / "reranker.onnx").read_text(), private))
 
     monkeypatch.setattr(tracking, "publish", fake_publish)
     tracking.promote(config, 1)
-    assert published == [(1, "one")]
+    assert published == [("someone/test-reranker", "v1", 1, "one", True)]
     _, version = tracking.download(config, "production", tmp_path / "prod")
     assert version == 1
 
@@ -97,3 +111,17 @@ def test_sasrec_import_is_idempotent(config, tmp_path):
 def test_metric_and_param_names():
     assert tracking.metric_name("ndcg@10") == "ndcg_at_10"
     assert tracking.flat_params("c.", {"a": 1, "b": {"x": 2}}, {}) == {"c.a": 1, "c.b.x": 2}
+
+
+def test_offline_variant_is_not_registered_nor_promoted(config, tmp_path):
+    offline = dict(config)
+    offline["candidates"] = dict(config["candidates"], audio=30)
+    offline["rerank"] = dict(config["rerank"], audio_features=True, name="reranker")
+    assert tracking.log_reranker(offline, REPORT, model_dir(tmp_path, "audio")) is None
+    client = tracking.connect(config)
+    run = client.search_runs([tracking.experiment(client, "reranker")])[0]
+    assert run.data.tags["variant"] == "audio"
+    client.create_registered_model("test-reranker")
+    client.create_model_version("test-reranker", "runs:/%s/model" % run.info.run_id, run_id=run.info.run_id)
+    with pytest.raises(SystemExit):
+        tracking.promote(config, 1, publish_model=False)

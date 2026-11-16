@@ -8,7 +8,7 @@ pytest.importorskip("onnxruntime")
 
 from nexttrack.config import load_config  # noqa: E402
 from nexttrack.eval import regression  # noqa: E402
-from nexttrack.rerank.features import FEATURES  # noqa: E402
+from nexttrack.rerank.features import AUDIO_FEATURES  # noqa: E402
 
 HISTORY = [
     "history_score",
@@ -37,7 +37,10 @@ def cfg():
 
 def test_frozen_set_layout(frozen):
     assert len(frozen["sizes"]) == regression.NUM_USERS
-    assert frozen["features"].shape == (frozen["sizes"].sum(), len(FEATURES))
+    assert frozen["features"].shape == (frozen["sizes"].sum(), len(frozen["names"]))
+    # The frozen set is the production variant: no audio feature.
+    for name in AUDIO_FEATURES:
+        assert name not in list(frozen["names"])
     assert frozen["target_sizes"].sum() == len(frozen["targets"])
 
 
@@ -51,7 +54,7 @@ def test_degraded_features_fail_the_check(frozen, reference, cfg):
     broken = dict(frozen)
     broken["features"] = frozen["features"].copy()
     for name in HISTORY:
-        broken["features"][:, FEATURES.index(name)] = 0.0
+        broken["features"][:, list(frozen["names"]).index(name)] = 0.0
     reasons = regression.failures(regression.measure(broken, cfg), reference)
     assert len(reasons) == 1
     assert "below reference" in reasons[0]

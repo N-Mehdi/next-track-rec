@@ -99,6 +99,38 @@ def bootstrap(hits, num_targets, k_values, samples=BOOTSTRAP_SAMPLES, seed=0):
     return result
 
 
+def paired_bootstrap(ranked_a, ranked_b, targets, k_values, samples=BOOTSTRAP_SAMPLES, seed=0):
+    """Difference a minus b with a 95 % interval, both models scored on the same user draws."""
+    num_targets = lengths(targets)
+    hits_a = hit_matrix(np.asarray(ranked_a), targets)
+    hits_b = hit_matrix(np.asarray(ranked_b), targets)
+    rng = np.random.default_rng(seed)
+    draws = []
+    for _ in range(samples):
+        draws.append(rng.integers(0, len(targets), size=len(targets)))
+    result = {}
+    for k in k_values:
+        values_a = per_user(hits_a, num_targets, k)
+        values_b = per_user(hits_b, num_targets, k)
+        point_a = summarize(values_a)
+        point_b = summarize(values_b)
+        collected = {}
+        for draw in draws:
+            summary_a = summarize(values_a, draw)
+            summary_b = summarize(values_b, draw)
+            for name in summary_a:
+                if name not in collected:
+                    collected[name] = []
+                collected[name].append(summary_a[name] - summary_b[name])
+        for name in collected:
+            low, high = np.percentile(collected[name], [2.5, 97.5])
+            result["%s@%d" % (name, k)] = {
+                "diff": point_a[name] - point_b[name],
+                "ci95": [float(low), float(high)],
+            }
+    return result
+
+
 def cold_targets(targets, train_items):
     """Targets never seen in training, with the indices of users that have at least one."""
     flat = np.concatenate(targets)

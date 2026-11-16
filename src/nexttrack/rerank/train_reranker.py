@@ -113,6 +113,8 @@ def export_onnx(model_file, features, path):
     """ONNX copy of the saved booster; returns ONNX and LightGBM scores on the given rows."""
     booster = lgb.Booster(model_file=str(model_file))
     model = convert_lightgbm(booster, initial_types=[("features", FloatTensorType([None, len(FEATURES)]))])
+    # The converter names the graph with a random id: a fixed name makes the file reproducible.
+    model.graph.name = "nexttrack_reranker"
     with open(path, "wb") as handle:
         handle.write(model.SerializeToString())
     session = onnxruntime.InferenceSession(str(path), providers=["CPUExecutionProvider"])

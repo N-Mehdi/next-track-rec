@@ -1,0 +1,119 @@
+{
+  "stages": {
+    "download": {
+      "code": "31f7fae6e920c2bd7d4089e3c37605512b8706a013530c5b57d6e51ae4e36f52",
+      "config": "64cc4443249549846832ce65645faeb9ef7ead83e47e8793cbe5f1b4728c5533",
+      "inputs": {},
+      "seconds": 336.5,
+      "outputs": {
+        "data/raw/flat/50m/listens.parquet": "eed9cbd094af1e189507d2f8132a0dc9653b90e65480125c7cdccd601e0592d1",
+        "data/raw/flat/50m/likes.parquet": "694087077dbacfcc1d22a5ca85cc6bd8ab182361933406e60500624c6a422bc4",
+        "data/raw/flat/50m/dislikes.parquet": "64f240a6d62b8acdfa6efae660a54d10ebc64f9f2f0aeeef8e6bb0dbe7dc2802",
+        "data/raw/flat/50m/unlikes.parquet": "532213992934de765874691ac145324078e61987df26c88e1d671d23f8853180",
+        "data/raw/flat/50m/undislikes.parquet": "8cdbcf6e7e79491d560637057ba8ac078dd1610a3fab15442b6f12e45069ef85",
+        "data/raw/embeddings.parquet": "c8959a584257473ab9f5dab7e88b05ea3d03b4daf7c16e9a617e8e216d811c83",
+        "data/raw/album_item_mapping.parquet": "559b6576063d96280414574b32292eee7b47ee0b9f2952cb3ae670a5d19125e4",
+        "data/raw/artist_item_mapping.parquet": "cf1110aa2413ed70008ec9232d395660b2181ffda731002fb74da54e87b6f25d"
+      }
+    },
+    "split": {
+      "code": "4e5d4d0c45e19b63545b1262a761e13c8f5eb7c32f5ffded005b2cf0a09f11ab",
+      "config": "123dffa24b7b9ca89f2cb4f8db404511195f179c882674384dd766af88edcd53",
+      "inputs": {
+        "data/raw/flat/50m/listens.parquet": "eed9cbd094af1e189507d2f8132a0dc9653b90e65480125c7cdccd601e0592d1",
+        "data/raw/flat/50m/likes.parquet": "694087077dbacfcc1d22a5ca85cc6bd8ab182361933406e60500624c6a422bc4",
+        "data/raw/flat/50m/dislikes.parquet": "64f240a6d62b8acdfa6efae660a54d10ebc64f9f2f0aeeef8e6bb0dbe7dc2802",
+        "data/raw/flat/50m/unlikes.parquet": "532213992934de765874691ac145324078e61987df26c88e1d671d23f8853180",
+        "data/raw/flat/50m/undislikes.parquet": "8cdbcf6e7e79491d560637057ba8ac078dd1610a3fab15442b6f12e45069ef85",
+        "data/raw/embeddings.parquet": "c8959a584257473ab9f5dab7e88b05ea3d03b4daf7c16e9a617e8e216d811c83"
+      },
+      "seconds": 53.5,
+      "outputs": {
+        "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e"
+      }
+    },
+    "baselines": {
+      "code": "1ac57e8014f96d2cb5b815852ad5bd4f35a6b863265cfcbb1fe30efa1e360052",
+      "config": "ed51e98cc9b4b7d7149cd1c667faae9af95288da553a62233e78d866131a034c",
+      "inputs": {
+        "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e"
+      },
+      "seconds": 16.4,
+      "outputs": {
+        "reports/baselines.json": "e08ae313295e025485d2bdbe019394ac766b722f95c4e42e93ea635fcd682f4a"
+      }
+    },
+    "audio_knn": {
+      "code": "893ecc896751733d187914479841953348b1a1b9e7f4a358856736713ed7a88d",
+      "config": "ed51e98cc9b4b7d7149cd1c667faae9af95288da553a62233e78d866131a034c",
+      "inputs": {
+        "data/raw/embeddings.parquet": "c8959a584257473ab9f5dab7e88b05ea3d03b4daf7c16e9a617e8e216d811c83",
+        "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e"
+      },
+      "seconds": 142.1,
+      "outputs": {
+        "data/audio/item_ids.npy": "970940ed2b04c8496b2d595ff1adf8121aa4fe74f38c398e2c28a3d5fda3be56",
+        "data/audio/vectors.npy": "468b235449fb365e4acb06cde2eb702b457f40f7e37ae8b49e6cb5b56e9d2161",
+        "outputs/audio_knn": "37c1837c6e46e299e09a105de0bcd1004882dee32de7565dee4dfe6da47e8483",
+        "reports/audio_knn.json": "d333203e9942fd90c4b5ad3d1015f1bca110f5bdbf2ff8860b6c10c1e2553699"
+      }
+    },
+    "sasrec": {
+      "code": null,
+      "config": "ffe05d6ec9812b18ff7ee32ab2df5ef48384cfac65f541cd1008d6a22d693088",
+      "inputs": {
+        "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e"
+      },
+      "seconds": 0.0,
+      "outputs": {
+        "outputs/a_d128_e60": "f09f681fd5627ad37407a2a61fbdf7ffa2b8db06cf9eaea05201b137587a9f44"
+      }
+    },
+    "reranker": {
+      "code": "0b3f4050be2fdcc6b85db07cefc287975bbd789710a937c1f5ee04bb95e14635",
+      "config": "92ea6270bdb540072003f105acd49d06b77bbfd0b5b35a0765db178aa1602dd0",
+      "inputs": {
+        "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e",
+        "outputs/a_d128_e60": "f09f681fd5627ad37407a2a61fbdf7ffa2b8db06cf9eaea05201b137587a9f44",
+        "outputs/audio_knn": "37c1837c6e46e299e09a105de0bcd1004882dee32de7565dee4dfe6da47e8483",
+        "data/raw/artist_item_mapping.parquet": "cf1110aa2413ed70008ec9232d395660b2181ffda731002fb74da54e87b6f25d",
+        "data/audio/item_ids.npy": "970940ed2b04c8496b2d595ff1adf8121aa4fe74f38c398e2c28a3d5fda3be56",
+        "data/audio/vectors.npy": "468b235449fb365e4acb06cde2eb702b457f40f7e37ae8b49e6cb5b56e9d2161"
+      },
+      "seconds": 117.3,
+      "outputs": {
+        "outputs/rerank": "c5a23b7cbad835c6bb3f6a519d0a0922a37560bedcddad46afca47b7bb4fc168",
+        "reports/reranker.json": "ad6a99c589f84ca95297e656831904fde151e06b25bb142de451b338cd92342f"
+      }
+    },
+    "export": {
+      "code": "475aa8e08d4d637cad9eea2c58737db03c4233fa178f716a2fde1073b1f07901",
+      "config": "afe2138eed1ae087c9cc41e54e09a590ca191f83fdc0c7adb25e042a3ea55295",
+      "inputs": {
+        "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e",
+        "outputs/a_d128_e60": "f09f681fd5627ad37407a2a61fbdf7ffa2b8db06cf9eaea05201b137587a9f44",
+        "outputs/rerank": "c5a23b7cbad835c6bb3f6a519d0a0922a37560bedcddad46afca47b7bb4fc168",
+        "data/raw/artist_item_mapping.parquet": "cf1110aa2413ed70008ec9232d395660b2181ffda731002fb74da54e87b6f25d"
+      },
+      "seconds": 10.5,
+      "outputs": {
+        "artifacts": "27211dfb302ee8bab16dd76fbe667fd226622f419e8b13ff1aa9f29985ae3455"
+      }
+    }
+  },
+  "environment": {
+    "packages": {
+      "python": "3.13.11",
+      "numpy": "2.5.4",
+      "pyarrow": "26.0.1",
+      "pyspark": "4.3.0",
+      "torch": "2.15.0+cpu",
+      "faiss-cpu": "1.16.0",
+      "lightgbm": "4.7.0",
+      "onnxmltools": "1.16.0",
+      "onnxruntime": "1.31.1"
+    },
+    "git_commit": "dbc76d73c74b46a91099b3189311971d73a81bfc",
+    "code_changed_since_commit": true
+  }
+}

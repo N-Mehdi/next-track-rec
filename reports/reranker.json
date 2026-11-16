@@ -19,6 +19,7 @@
       "num_rounds": 500,
       "folds": 5,
       "seed": 42,
+      "num_threads": 0,
       "audio_every": 10
     }
   },
@@ -41,8 +42,8 @@
     "is_cold",
     "history_length"
   ],
-  "feature_seconds": 71.03137850761414,
-  "train_seconds": 119.31652498245239,
+  "feature_seconds": 47.06666135787964,
+  "train_seconds": 57.46351718902588,
   "training": {
     "rounds": 129,
     "cv_ndcg@10": 0.3496847363708352,

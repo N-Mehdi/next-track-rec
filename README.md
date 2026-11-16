@@ -122,8 +122,10 @@ Test day, 4,599 users. Reproduce with `python -m nexttrack.eval.baselines`
 - History: the tracks of the user's own history, each listen weighted by 0.9 per 24 hours
   of age before the end of the history. The paper has no repeat-aware baseline.
 
-Decay periods are selected on the validation day by `ndcg@100` (0.5 to 24 hours for
-DecayPop, 6 hours to 90 days and plain counts for History).
+Decay periods were selected on the validation day by `ndcg@100` (0.5 to 24 hours for
+DecayPop, 6 hours to 90 days and plain counts for History). The selected values are now
+fixed in `configs/default.yaml`; the grid results are in `reports/baselines.json` at
+commit `c3b165f`.
 
 Comparison with the paper (paper formulas):
 
@@ -183,8 +185,9 @@ embeddings as the only signal.
 Audio kNN (`python -m nexttrack.retrieval.audio_knn`, `reports/audio_knn.json`), no training:
 
 - Query: mean of the normalized audio embeddings of the user's last 5 listened tracks with
-  audio, renormalized. The number of tracks (1, 5, 10, 20, 50 or 200) is selected on the
-  validation day by `ndcg@100` on its never-seen targets; 1 to 20 give close values.
+  audio, renormalized. The number of tracks (1, 5, 10, 20, 50 or 200) was selected on the
+  validation day by `ndcg@100` on its never-seen targets; 1 to 20 give close values. The
+  value is fixed in the config; the grid is in `reports/audio_knn.json` at commit `0258210`.
 - Search pool: the 7,128,158 tracks of `embeddings.parquet` absent from training (exact
   inner product, FAISS). The pool does not depend on the test day; it holds 93.7 % of the
   `cold_strict` targets. A pool limited to tracks with any event before the test day
@@ -218,17 +221,19 @@ configs/default.yaml        paths, split and model hyperparameters
 src/nexttrack/
   constants.py              split boundaries, Listen+ threshold, k values
   config.py                 YAML loading with dotted overrides
+  pipeline.py               one command for the offline pipeline, manifest (MLOps phase)
   prep/                     download and Spark preparation (phase 1)
   data/                     SASRec training windows and inputs (phase 2)
   models/                   SASRec (phase 2)
   train/                    SASRec training and candidate export (phase 2)
   retrieval/                audio kNN over never-seen tracks (phase 3)
   rerank/                   candidate union, features, LightGBM, ONNX export (phase 4)
-  eval/                     metrics, bootstrap, baselines (phase 1)
+  eval/                     metrics, bootstrap, baselines (phase 1), non-regression check
   serve/                    artifact export and FastAPI application (phase 5)
-tests/
+tests/                      unit tests; tests/data holds the frozen non-regression sample
+.github/workflows/ci.yml    lint, tests and non-regression on every push and pull request
 notebooks/kaggle/           thin runner that clones this repository (SASRec on a T4)
-reports/                    JSON reports behind every table of this file
+reports/                    JSON reports behind every table of this file, pipeline manifest
 Dockerfile                  CPU image of the service
 ```
 
@@ -259,20 +264,45 @@ pytest
 Spark runs locally (the 50M flat files total about 400 MB compressed). Java 17 or 21 is
 required for Spark 4.
 
-### Data preparation (local)
+### Pipeline (local)
 
 ```bash
-python -m nexttrack.prep.download                 # 14.4 GB into data/raw, embeddings included
-python -m nexttrack.prep.split                    # Spark, writes data/prepared and stats.json
-python -m nexttrack.eval.baselines                # MostPop, DecayPop, History, writes reports/baselines.json
-python -m nexttrack.retrieval.audio_knn           # audio kNN on never-seen tracks, writes reports/audio_knn.json
+python -m nexttrack.pipeline --dry-run            # which stages are out of date, and why
+python -m nexttrack.pipeline                      # run them
+python -m nexttrack.pipeline --force reranker     # run a stage again
 ```
 
-Every command accepts `--config` and `--set section.key=value`. A smoke run on 300 users:
+| Stage | Module | Writes |
+|---|---|---|
+| download | `prep.download` | `data/raw`, 14.4 GB, Hub revision `data.revision` |
+| split | `prep.split` (Spark) | `data/prepared` |
+| baselines | `eval.baselines` | `reports/baselines.json` |
+| audio_knn | `retrieval.audio_knn` | `data/audio` (float32 cache), `outputs/audio_knn`, `reports/audio_knn.json` |
+| sasrec | trained on Kaggle, only checked | `outputs/a_d128_e60` |
+| reranker | `rerank.train_reranker` | `outputs/rerank`, `reports/reranker.json` |
+| export | `serve.export` | `artifacts/` |
 
-```bash
-python -m nexttrack.prep.split --set data.max_users=300 paths.prepared=data/smoke
-```
+A stage runs when its inputs, its code or its config sections differ from
+`reports/manifest.json`, or when one of its outputs is missing or changed. The code of a
+stage is its module and every `nexttrack` module it imports. Spark folders are hashed as
+tables sorted on their scalar columns, so the digest ignores file layout and row order;
+other files are hashed with sha256, cached by size and modification time in
+`.cache/fingerprints.json`. The manifest also records the Python and package versions and
+the git commit. The sasrec stage never trains: it stops with instructions when the SASRec
+outputs are missing or were trained on other prepared data.
+
+On this machine (12 cores, 30 GB) a full run takes about 6 minutes after the download:
+split 54 s, baselines 16 s, audio_knn 142 s (float32 cache included), reranker 113 s,
+export 10 s; the download of 14.4 GB depends on the network. With nothing changed, the
+command checks every stage in 0.3 s. Two runs give the same prepared tables, audio cache,
+candidates, reranker (LightGBM and ONNX, byte for byte), artifacts and test metrics. The
+sha256 of the raw files recorded in the manifest equal the ones published on the Hub for
+the pinned revision.
+
+Every module also runs alone (`python -m nexttrack.prep.split`, ...). Every command
+accepts `--config` and `--set section.key=value`. `split.shift_days` moves every split
+boundary earlier, for the replay of past days: `--set split.shift_days=30
+paths.prepared=data/prepared_d30`.
 
 Prepared folders (parquet, one per table):
 
@@ -326,11 +356,11 @@ targets are repeats of the user's own history, which a next-item model over the 
 catalogue ranks less sharply than a recency-weighted count. SASRec cannot score tracks
 absent from training (both cold definitions give 0).
 
-A local smoke run on CPU:
+A local smoke run on CPU, on the full prepared data:
 
 ```bash
-python -m nexttrack.train.train_sasrec --set paths.prepared=data/smoke paths.outputs=data/smoke_outputs \
-    sasrec.embedding_dim=32 sasrec.epochs=2 sasrec.max_steps_per_epoch=10 sasrec.num_negatives=256
+python -m nexttrack.train.train_sasrec --set paths.outputs=data/smoke_outputs \
+    sasrec.embedding_dim=32 sasrec.epochs=1 sasrec.max_steps_per_epoch=10 sasrec.num_negatives=256
 ```
 
 ### Reranker (local, CPU)

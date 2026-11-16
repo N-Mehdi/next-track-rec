@@ -3,8 +3,9 @@
 The query of a user is the mean of the normalized audio embeddings of the last listened
 tracks. The search pool is every track of embeddings.parquet absent from item_map: the
 tracks that SASRec cannot score. The pool does not depend on the test day, so it holds no
-information about the targets. The number of averaged tracks is selected on the validation
-day by ndcg@100 on its never-seen targets.
+information about the targets. The number of averaged tracks (candidates.audio_history_items,
+5) was selected in phase 3 on the never-seen targets of the validation day (grid kept in
+the git history of reports/audio_knn.json, commit 0258210).
 """
 
 from pathlib import Path
@@ -26,7 +27,6 @@ from nexttrack.tables import (
     write_ranked,
 )
 
-HISTORY_GRID = [1, 5, 10, 20, 50, 200]
 EMBEDDING_DIM = 128
 BATCH_ROWS = 200_000
 
@@ -128,34 +128,22 @@ def main():
     # The validation history ends at TRAIN_END: both definitions coincide there.
     val_seen = {"cold_train": seen["cold_train"]}
 
-    val_uids, val_targets, val_histories = load_split(prepared, "val")
-    validation = {}
-    best = None
-    best_value = -1.0
-    for num_items in HISTORY_GRID:
-        queries = user_queries(val_histories, item_ids, vectors, num_items)
-        ranked, _ = search(index, pool_ids, queries, constants.NUM_RANKED)
-        result = evaluate(ranked, val_targets, k_values, len(pool_ids), val_seen)
-        validation[str(num_items)] = result
-        value = result["cold_train"]["metrics"]["ndcg@100"]
-        print("val last", num_items, "cold ndcg@100=%.4f" % value, flush=True)
-        if value > best_value:
-            best_value = value
-            best = num_items
-
+    num_items = config["candidates"]["audio_history_items"]
     outputs = Path(paths["outputs"]) / "audio_knn"
-    queries = user_queries(val_histories, item_ids, vectors, best)
+    val_uids, val_targets, val_histories = load_split(prepared, "val")
+    queries = user_queries(val_histories, item_ids, vectors, num_items)
     ranked, scores = search(index, pool_ids, queries, constants.NUM_RANKED)
     write_ranked(outputs / "candidates_val.parquet", val_uids, ranked, scores)
+    validation = evaluate(ranked, val_targets, k_values, len(pool_ids), val_seen)
     test_uids, test_targets, test_histories = load_split(prepared, "test")
-    queries = user_queries(test_histories, item_ids, vectors, best)
+    queries = user_queries(test_histories, item_ids, vectors, num_items)
     ranked, scores = search(index, pool_ids, queries, constants.NUM_RANKED)
     write_ranked(outputs / "candidates_test.parquet", test_uids, ranked, scores)
     test = evaluate(ranked, test_targets, k_values, len(pool_ids), seen)
     for name in ["cold_train", "cold_strict"]:
         print("test", name, test[name]["metrics"]["recall@100"], test[name]["ci95"]["recall@100"])
 
-    report = {"pool_size": len(pool_ids), "best_history_items": best, "validation": validation, "test": test}
+    report = {"pool_size": len(pool_ids), "history_items": num_items, "validation": validation, "test": test}
     write_json(to_builtin(report), Path(paths["reports"]) / "audio_knn.json")
 
 

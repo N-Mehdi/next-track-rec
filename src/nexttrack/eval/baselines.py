@@ -3,8 +3,10 @@
 MostPop and DecayPop check the split and the metrics against the paper: on Listen+ 50M
 the paper reports recall_paper@10 of 0.0064 and 0.0122, ndcg_paper@10 of 0.0186 and 0.0260.
 History ranks the tracks of the user's own history by recency weighted listen counts.
-Decay periods are tuned on the validation day, then models are scored on the test day
-with every event before VAL_END, as the official baselines do.
+The decay periods (candidates.decay_pop_hours and history_hours) were selected on the
+validation day in phase 1 (grid kept in the git history of reports/baselines.json, commit
+c3b165f). Models are scored on the test day with every event before VAL_END, as the
+official baselines do.
 """
 
 from pathlib import Path
@@ -15,9 +17,6 @@ from nexttrack import constants
 from nexttrack.config import parse_args
 from nexttrack.eval.metrics import evaluate
 from nexttrack.tables import flat_column, list_column, read_table, seen_item_sets, write_json
-
-POP_HOURS = [0.5, 1, 2, 3, 6, 12, 24]
-HISTORY_HOURS = [6, 24, 72, 168, 720, 2160]
 
 
 def decayed_scores(item_ids, timestamps, hours):
@@ -95,37 +94,14 @@ def run_split(prepared, split, pop_hours, history_hours, k_values, seen_sets):
     return results
 
 
-def best_hours(results, prefix, hours_list, metric):
-    best = None
-    best_value = -1.0
-    for hours in hours_list:
-        value = results["%s_%gh" % (prefix, hours)]["all"][metric]
-        if value > best_value:
-            best_value = value
-            best = hours
-    return best
-
-
 def main():
     config, _ = parse_args("Popularity and history baselines")
     prepared = Path(config["paths"]["prepared"])
     k_values = config["eval"]["k_values"]
-    seen = seen_item_sets(prepared)
-    # On the validation day both definitions coincide: its history ends at TRAIN_END.
-    val_seen = {"cold_train": seen["cold_train"]}
-
-    history_grid = [None] + HISTORY_HOURS
-    validation = run_split(prepared, "val", [None] + POP_HOURS, history_grid, k_values, val_seen)
-    pop_best = best_hours(validation, "decay_pop", POP_HOURS, "ndcg@100")
-    history_best = best_hours(validation, "history", HISTORY_HOURS, "ndcg@100")
-    test = run_split(prepared, "test", [None, pop_best], [history_best], k_values, seen)
-
-    report = {
-        "best_decay_pop_hours": pop_best,
-        "best_history_hours": history_best,
-        "validation": validation,
-        "test": test,
-    }
+    pop_hours = config["candidates"]["decay_pop_hours"]
+    history_hours = config["candidates"]["history_hours"]
+    test = run_split(prepared, "test", [None, pop_hours], [history_hours], k_values, seen_item_sets(prepared))
+    report = {"decay_pop_hours": pop_hours, "history_hours": history_hours, "test": test}
     write_json(report, Path(config["paths"]["reports"]) / "baselines.json")
 
 

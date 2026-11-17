@@ -19,6 +19,7 @@ def config(tmp_path, monkeypatch):
             "model_name": "test-reranker",
             "hf_repo": "someone/test-reranker",
             "hf_private": True,
+            "k8s_manifest": str(tmp_path / "deployment.yaml"),
         },
         "paths": {"prepared": str(tmp_path / "prepared")},
         "candidates": {"sasrec": 100, "audio": 0, "sasrec_dir": str(tmp_path / "sasrec")},
@@ -41,6 +42,15 @@ def model_dir(tmp_path, content):
     (folder / "reranker.txt").write_text(content)
     return folder
 
+
+MANIFEST = """spec:
+  containers:
+    - env:
+        - name: NEXTTRACK_RERANKER_REVISION
+          value: "v0"
+        - name: NEXTTRACK_RETRIEVAL_REVISION
+          value: "run_a"
+"""
 
 REPORT = {
     "training": {"rounds": 12, "cv_ndcg@10": 0.3},
@@ -83,7 +93,10 @@ def test_promote_publishes_the_production_version(config, tmp_path, monkeypatch)
         published.append((repo, tag, version, (folder / "reranker.onnx").read_text(), private))
 
     monkeypatch.setattr(tracking, "publish", fake_publish)
+    (tmp_path / "deployment.yaml").write_text(MANIFEST)
     tracking.promote(config, 1)
+    # The new tag is written for the deployment, nothing else changes.
+    assert (tmp_path / "deployment.yaml").read_text() == MANIFEST.replace('"v0"', '"v1"')
     assert published == [("someone/test-reranker", "v1", 1, "one", True)]
     _, version = tracking.download(config, "production", tmp_path / "prod")
     assert version == 1
@@ -125,3 +138,13 @@ def test_offline_variant_is_not_registered_nor_promoted(config, tmp_path):
     client.create_model_version("test-reranker", "runs:/%s/model" % run.info.run_id, run_id=run.info.run_id)
     with pytest.raises(SystemExit):
         tracking.promote(config, 1, publish_model=False)
+
+
+def test_set_revision_needs_the_variable(tmp_path):
+    path = tmp_path / "deployment.yaml"
+    path.write_text(MANIFEST)
+    tracking.set_revision(path, "NEXTTRACK_RETRIEVAL_REVISION", "run_b")
+    assert 'value: "run_b"' in path.read_text()
+    assert 'value: "v0"' in path.read_text()
+    with pytest.raises(SystemExit):
+        tracking.set_revision(path, "MISSING", "x")

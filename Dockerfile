@@ -8,7 +8,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     NEXTTRACK_COMMIT=${COMMIT} \
     NEXTTRACK_RERANKER=N-Mehdi/nexttrack-reranker \
-    NEXTTRACK_RETRIEVAL=N-Mehdi/nexttrack-retrieval
+    NEXTTRACK_RETRIEVAL=N-Mehdi/nexttrack-retrieval \
+    # Plain HTTP downloads from the Hub: the Xet transfer failed intermittently at start.
+    HF_HUB_DISABLE_XET=1
 
 WORKDIR /app
 COPY pyproject.toml README.md LICENSE ./

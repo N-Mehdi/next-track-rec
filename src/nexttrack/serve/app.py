@@ -44,13 +44,25 @@ def session(path):
     return onnxruntime.InferenceSession(str(path), providers=["CPUExecutionProvider"])
 
 
-def resolve(source, revision):
-    """A local folder, or a Hugging Face model repository downloaded at the revision."""
+def resolve(source, revision, attempts=4):
+    """A local folder, or a Hugging Face model repository downloaded at the revision.
+
+    Network errors of the Hub are retried; files already in the cache are not fetched again."""
     if Path(source).is_dir():
         return Path(source)
     from huggingface_hub import snapshot_download
 
-    return Path(snapshot_download(repo_id=source, revision=revision))
+    for attempt in range(1, attempts + 1):
+        try:
+            return Path(snapshot_download(repo_id=source, revision=revision))
+        except Exception as error:
+            if attempt == attempts:
+                raise
+            print(
+                "download of %s failed (%s), attempt %d of %d" % (source, error, attempt, attempts),
+                flush=True,
+            )
+            time.sleep(15 * attempt)
 
 
 def read_json(path, default=None):

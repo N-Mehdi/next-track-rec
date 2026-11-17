@@ -234,10 +234,11 @@ src/nexttrack/
   eval/                     metrics, bootstrap, baselines (phase 1), non-regression check
   serve/                    artifact export and FastAPI application (phase 5)
 tests/                      unit tests; tests/data holds the frozen non-regression sample
-.github/workflows/ci.yml    lint, tests and non-regression on every push and pull request
+.github/workflows/ci.yml    tests on every push and pull request; image and deployment on main
 notebooks/kaggle/           thin runner that clones this repository (SASRec on a T4)
 reports/                    JSON reports behind every table of this file, pipeline manifest
 Dockerfile                  CPU image of the service
+k8s/                        Deployment, Service and Ingress for SSP Cloud
 docker-compose.yml          local MLflow (experiments, registry, aliases)
 ```
 
@@ -540,6 +541,33 @@ SASRec candidates, computed in fp16 on the GPU offline and in fp32 in the servic
 request takes 62 ms (p50) and 85 ms (p95) on 12 cores; the container loads in under a
 second and uses about 1.0 GB. The audio variant (`settings.json` with audio, audio vectors
 in `NEXTTRACK_AUDIO`) still runs, at about 0.5 s per request and 4.7 GB.
+
+## Deployment (Kubernetes on SSP Cloud)
+
+`.github/workflows/ci.yml` continues after the tests on every push to `main`:
+
+1. `image`: builds the CPU image and pushes it to GHCR with the `GITHUB_TOKEN`, tagged
+   with the commit and `latest` (`ghcr.io/n-mehdi/next-track-rec`, public package).
+2. `deploy`: with the `KUBECONFIG` secret of the SSP Cloud namespace, writes the commit tag
+   in `k8s/deployment.yaml`, applies `k8s/` (Deployment, Service, Ingress), waits for the
+   rollout, then checks that `/health` behind the ingress returns that commit.
+
+The model revisions live in `k8s/deployment.yaml` (`NEXTTRACK_RERANKER_REVISION`,
+`NEXTTRACK_RETRIEVAL_REVISION`). A promotion writes them:
+
+```bash
+python -m nexttrack.tracking promote 4            # alias production, Hugging Face tag v4, manifest v4
+python -m nexttrack.serve.export --publish        # new retrieval bundle, after a new SASRec run
+git commit k8s/deployment.yaml && git push        # the CD deploys it
+```
+
+Every model in production is therefore a git commit of the manifest, an MLflow version
+and a Hugging Face tag. The pod downloads both repositories at start (about 700 MB, into
+an `emptyDir`; plain HTTP transfer, the Xet transfer of the Hub failed intermittently in
+the container), requests 1.5 GiB of memory with a 2 GiB limit, and is ready once `/health`
+answers: 80 to 140 s in local cold starts of the image, within the 300 s of the startup
+probe. The `KUBECONFIG` token of SSP Cloud expires: when the deploy job fails
+on authentication, the secret must be renewed from the SSP Cloud account page.
 
 ## Models
 

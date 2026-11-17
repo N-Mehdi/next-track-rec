@@ -1,0 +1,63 @@
+# The CD replaces the image tag with the commit; nexttrack.tracking promote writes the
+# reranker revision, nexttrack.serve.export --publish the retrieval revision.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexttrack
+  labels:
+    app: nexttrack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexttrack
+  template:
+    metadata:
+      labels:
+        app: nexttrack
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: api
+          image: ghcr.io/n-mehdi/next-track-rec:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: NEXTTRACK_RERANKER_REVISION
+              value: "v3"
+            - name: NEXTTRACK_RETRIEVAL_REVISION
+              value: "a_d128_e60"
+            - name: HF_HOME
+              value: /cache/huggingface
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1536Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          volumeMounts:
+            - name: cache
+              mountPath: /cache
+          # The models (about 700 MB) are downloaded from Hugging Face at start.
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 30
+      volumes:
+        - name: cache
+          emptyDir:
+            sizeLimit: 3Gi

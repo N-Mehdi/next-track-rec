@@ -40,3 +40,60 @@ jobs:
       # Trains the reranker on the frozen set and compares ndcg@10 with the reference.
       - name: Reranker non-regression
         run: python -m nexttrack.eval.regression
+
+  # Delivery, on pushes to main only: image on GHCR, then deployment on SSP Cloud.
+  image:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          build-args: COMMIT=${{ github.sha }}
+          tags: |
+            ghcr.io/n-mehdi/next-track-rec:${{ github.sha }}
+            ghcr.io/n-mehdi/next-track-rec:latest
+
+  deploy:
+    needs: image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency: deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-kubectl@v4
+
+      # Kubeconfig of the SSP Cloud namespace; its token expires and must be renewed.
+      - uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      # The image of this commit; the model revisions come from k8s/deployment.yaml.
+      - name: Deploy
+        run: |
+          sed -i "s|ghcr.io/n-mehdi/next-track-rec:latest|ghcr.io/n-mehdi/next-track-rec:${GITHUB_SHA}|" k8s/deployment.yaml
+          kubectl apply -f k8s/
+          kubectl rollout status deployment/nexttrack --timeout=15m
+
+      - name: Smoke test
+        run: |
+          host=$(kubectl get ingress nexttrack -o jsonpath='{.spec.rules[0].host}')
+          health=$(curl -sf --retry 5 --retry-delay 10 "https://${host}/health")
+          echo "${health}"
+          echo "${health}" | grep -q "\"commit\":\"${GITHUB_SHA}\""

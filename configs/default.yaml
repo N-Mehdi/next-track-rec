@@ -101,3 +101,5 @@ tracking:
   # Retrieval bundle of the service (SASRec encoder, item vectors, item tables).
   retrieval_repo: N-Mehdi/nexttrack-retrieval
   hf_private: false
+  # Deployment where promotions write the model revisions (deployed by the CD on push).
+  k8s_manifest: k8s/deployment.yaml

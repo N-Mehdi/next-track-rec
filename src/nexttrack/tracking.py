@@ -5,7 +5,7 @@ training, logged by rerank.train_reranker). Each reranker run registers a versio
 model tracking.model_name. The aliases staging and production point to versions; the
 registry is the source of truth. Promotion to production also publishes the model files
 to the Hugging Face repository tracking.hf_repo, tagged with the MLflow version, which the
-deployed service downloads at start.
+deployed service downloads at start, and writes that tag in the Kubernetes manifest.
 
   python -m nexttrack.tracking import-sasrec reports/sasrec_a_d128.json ...
   python -m nexttrack.tracking log-reranker            log the last training (outputs/<rerank.name>)
@@ -193,6 +193,19 @@ def publish(repo, folder, tag, message, private, description):
     print("published", repo, "tag", tag)
 
 
+def set_revision(manifest, variable, value):
+    """Write a model revision in the Kubernetes manifest: the value line after its name."""
+    lines = Path(manifest).read_text(encoding="utf-8").split("\n")
+    for i in range(len(lines) - 1):
+        if lines[i].strip() == "- name: " + variable:
+            indent = lines[i + 1][: len(lines[i + 1]) - len(lines[i + 1].lstrip())]
+            lines[i + 1] = '%svalue: "%s"' % (indent, value)
+            Path(manifest).write_text("\n".join(lines), encoding="utf-8")
+            print(manifest, variable, "=", value, "(commit and push to deploy)")
+            return
+    raise SystemExit("%s not found in %s" % (variable, manifest))
+
+
 def promote(config, version, publish_model=True, client=None):
     """Point production to the version, then publish its files for the deployed service."""
     client = client or connect(config)
@@ -221,6 +234,7 @@ def promote(config, version, publish_model=True, client=None):
             tracking["hf_private"],
             description,
         )
+    set_revision(config["tracking"]["k8s_manifest"], "NEXTTRACK_RERANKER_REVISION", tag)
 
 
 def add_arguments(parser):

@@ -75,7 +75,7 @@ def main():
         json.dump(info, handle, indent=2)
     print("retrieval bundle", info["name"], "written to", out_dir)
     if args.publish:
-        from nexttrack.tracking import publish
+        from nexttrack.tracking import publish, set_revision
 
         repo = config["tracking"]["retrieval_repo"]
         description = (
@@ -85,6 +85,7 @@ def main():
         )
         private = config["tracking"]["hf_private"]
         publish(repo, out_dir, info["name"], "Retrieval bundle " + info["name"], private, description)
+        set_revision(config["tracking"]["k8s_manifest"], "NEXTTRACK_RETRIEVAL_REVISION", info["name"])
 
 
 if __name__ == "__main__":

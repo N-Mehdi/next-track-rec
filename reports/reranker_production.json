@@ -42,8 +42,8 @@
     "is_cold",
     "history_length"
   ],
-  "feature_seconds": 45.33638262748718,
-  "train_seconds": 55.28030467033386,
+  "feature_seconds": 60.02230143547058,
+  "train_seconds": 110.38710331916809,
   "training": {
     "rounds": 94,
     "cv_ndcg@10": 0.33950671509595043,

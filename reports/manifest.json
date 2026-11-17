@@ -70,7 +70,7 @@
       }
     },
     "reranker": {
-      "code": "4cae795d624a8680b223bf2673757b888f683dc02d2cc14d137c78c0a3c8f558",
+      "code": "b723ebc781b276049f274f2b31d5a5628e3f0eaca159e4e5a2cd8059b4685f3c",
       "config": "304f9549b54e6a75a1d0049aad5a94956983425ca07d963a6ac5ec873e9a9d82",
       "inputs": {
         "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e",
@@ -81,14 +81,14 @@
         "data/audio/item_ids.npy": "970940ed2b04c8496b2d595ff1adf8121aa4fe74f38c398e2c28a3d5fda3be56",
         "data/audio/vectors.npy": "468b235449fb365e4acb06cde2eb702b457f40f7e37ae8b49e6cb5b56e9d2161"
       },
-      "seconds": 118.3,
+      "seconds": 188.5,
       "outputs": {
-        "outputs/reranker": "c2acaf3e411fabb9a29a8e351a68d3323bc45378efdad55d5691bba459188047",
-        "reports/reranker.json": "fd16527ab01c4fb61d9935617b383ed7ee998b82ff6aee65ad03d871f93bd6fc"
+        "outputs/reranker": "c5a23b7cbad835c6bb3f6a519d0a0922a37560bedcddad46afca47b7bb4fc168",
+        "reports/reranker.json": "0694e7ea83cfe3b72bf1d771146ca5b52cbb01667745eab1a3a477470b065277"
       }
     },
     "export": {
-      "code": "ce81c2d038d473cf39a473ee5da4aa05e7075873c62ec8bc4806b6ca9185ad1e",
+      "code": "a1f422f89b127382ea6c67505514c6404db2be25913059a28a354c5dbcfac748",
       "config": "6ba255d32d4ed93949404156dbf2af13b0501f96fd677f53d9a70ced445c9c13",
       "inputs": {
         "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e",
@@ -96,13 +96,13 @@
         "data/raw/artist_item_mapping.parquet": "cf1110aa2413ed70008ec9232d395660b2181ffda731002fb74da54e87b6f25d",
         "data/raw/album_item_mapping.parquet": "559b6576063d96280414574b32292eee7b47ee0b9f2952cb3ae670a5d19125e4"
       },
-      "seconds": 12.4,
+      "seconds": 13.0,
       "outputs": {
-        "artifacts/retrieval": "cb5b070fc0b4ac1359489c00d6ddd469f1c885a6bf4d1c7f73a365ae114f8e85"
+        "artifacts/retrieval": "869446658475173bd867d130efdc7530ec8cf6a94f9a76def359f6f8a7444d06"
       }
     },
     "reranker_production": {
-      "code": "4cae795d624a8680b223bf2673757b888f683dc02d2cc14d137c78c0a3c8f558",
+      "code": "b723ebc781b276049f274f2b31d5a5628e3f0eaca159e4e5a2cd8059b4685f3c",
       "config": "c38971e426337b4f481f74e2b89d2ad9ec5018b1152b8e25b8abdfd2436ac7bb",
       "inputs": {
         "data/prepared": "9f9c7e138046298e57f5a409a4a8aac5abd0d603aa4963062e32f16ae3e5a44e",
@@ -110,10 +110,10 @@
         "data/raw/artist_item_mapping.parquet": "cf1110aa2413ed70008ec9232d395660b2181ffda731002fb74da54e87b6f25d",
         "data/raw/album_item_mapping.parquet": "559b6576063d96280414574b32292eee7b47ee0b9f2952cb3ae670a5d19125e4"
       },
-      "seconds": 112.3,
+      "seconds": 184.7,
       "outputs": {
         "outputs/reranker_production": "55bb2626c9374956497663045ebccc4a375430ee796f101a3692da7e27d47486",
-        "reports/reranker_production.json": "a5afa57310f4a564d0193f0bcabbca1aa3aaa7977859c8e443a2f124814e1fc7"
+        "reports/reranker_production.json": "c6caf4d9ace74f647de95b66969c95efdcd88bd48547d752df587f01144c9147"
       }
     }
   },
@@ -129,7 +129,7 @@
       "onnxmltools": "1.16.0",
       "onnxruntime": "1.31.1"
     },
-    "git_commit": "9026d19f244bf1fbd58c6910da358d65a34fbbfe",
+    "git_commit": "7742626670414ab849a41ab7a4bda0ca123bf989",
     "code_changed_since_commit": true
   }
 }
